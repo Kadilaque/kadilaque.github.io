@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Márcio Gabriel Vieira — Desenvolvedor Full Stack</title>
+<meta name="description" content="Portfólio de Márcio Gabriel Vieira, estudante de TI e desenvolvedor full stack — apps web, mobile e jogos.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%237c3aed'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-size='26' font-weight='bold' fill='white' text-anchor='middle'%3EMV%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#09090e">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Márcio Gabriel Vieira — Desenvolvedor Full Stack">
+<meta property="og:description" content="Apps web, mobile e jogos — com demo interativo de um sistema em produção. Estudante de Ciência da Computação buscando estágio.">
+<meta property="og:url" content="https://kadilaque.github.io/">
+<meta property="og:image" content="https://kadilaque.github.io/assets/og-cover.png">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="noise-overlay"></div>
+
+<header class="nav" id="nav">
+  <a href="#top" class="nav-logo">MV<span>.</span></a>
+  <nav class="nav-links">
+    <a href="#sobre">Sobre</a>
+    <a href="#skills">Skills</a>
+    <a href="#projetos">Projetos</a>
+    <a href="#lumikode">Lumikode</a>
+    <a href="#contato">Contato</a>
+  </nav>
+  <a href="#contato" class="btn btn-small btn-outline nav-cta">Vamos conversar</a>
+</header>
+
+<main>
+
+  <section class="hero" id="top">
+    <div class="hero-blob blob-1"></div>
+    <div class="hero-blob blob-2"></div>
+    <div class="hero-grid"></div>
+
+    <div class="hero-content reveal">
+      <p class="hero-kicker">Estudante de TI · Buscando estágio</p>
+      <h1 class="hero-title">
+        Olá, eu sou <span class="text-gradient">Márcio Gabriel</span>.
+        <span class="typed-line">
+          <span class="typed-ghost" aria-hidden="true">Desenvolvedor Full Stack</span>
+          <span class="typed-live">Desenvolvedor <span class="typed" id="typed"></span></span>
+        </span>
+      </h1>
+      <p class="hero-subtitle">
+        Construo aplicações do zero — do banco de dados à interface. Já entreguei um
+        sistema de gestão em produção, um app de comandas para restaurante e jogos
+        completos, sempre cuidando de cada detalhe da experiência.
+      </p>
+      <div class="hero-actions">
+        <a href="#projetos" class="btn btn-primary">Ver projetos</a>
+        <a href="#contato" class="btn btn-outline">Entrar em contato</a>
+      </div>
+    </div>
+
+    <a href="#sobre" class="scroll-cue" aria-label="Rolar para baixo">
+      <span></span>
+    </a>
+  </section>
+
+  <section class="section" id="sobre">
+    <div class="section-head reveal">
+      <p class="section-kicker">Sobre mim</p>
+      <h2>Quem escreve o código</h2>
+    </div>
+
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <div class="avatar">MV</div>
+        <p>
+          Sou estudante de Tecnologia da Informação e desenvolvedor autodidata, com
+          foco em construir produtos completos — não apenas telas. Gosto de entender
+          o problema real por trás do pedido: uma portaria que precisa organizar
+          encomendas, um restaurante que precisa agilizar comandas, um jogo que
+          precisa ser divertido de verdade.
+        </p>
+        <p>
+          Trabalho confortável em todas as camadas de uma aplicação: interface,
+          lógica de back-end, banco de dados e infraestrutura de deploy. Também
+          desenvolvo jogos em Godot Engine, o que me ajuda a pensar em experiência
+          do usuário, performance e polimento visual mesmo fora do contexto de jogos.
+        </p>
+        <p>
+          Atualmente busco minha primeira oportunidade de estágio para continuar
+          aprendendo em equipe e aplicar essa base em projetos de maior escala.
+        </p>
+      </div>
+
+      <div class="about-facts reveal">
+        <div class="fact-card glow">
+          <span class="fact-label">Foco atual</span>
+          <span class="fact-value">Desenvolvimento Full Stack</span>
+        </div>
+        <div class="fact-card glow">
+          <span class="fact-label">Formação</span>
+          <span class="fact-value">Tecnologia da Informação (em curso)</span>
+        </div>
+        <div class="fact-card glow">
+          <span class="fact-label">Também construo</span>
+          <span class="fact-value">Jogos 2D em Godot Engine</span>
+        </div>
+        <div class="fact-card glow">
+          <span class="fact-label">Disponibilidade</span>
+          <span class="fact-value">Aberto a estágio e projetos</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="skills">
+    <div class="section-head reveal">
+      <p class="section-kicker">Stack</p>
+      <h2>Ferramentas que eu uso</h2>
+    </div>
+
+    <div class="skills-grid">
+      <div class="skill-group reveal">
+        <h3>Front-end</h3>
+        <div class="icon-row">
+          <div class="tech glow" title="HTML5"><img src="https://cdn.simpleicons.org/html5/a78bfa" alt="HTML5"><span>HTML5</span></div>
+          <div class="tech glow" title="CSS"><img src="https://cdn.simpleicons.org/css/a78bfa" alt="CSS"><span>CSS</span></div>
+          <div class="tech glow" title="JavaScript"><img src="https://cdn.simpleicons.org/javascript/a78bfa" alt="JavaScript"><span>JavaScript</span></div>
+        </div>
+      </div>
+      <div class="skill-group reveal">
+        <h3>Back-end &amp; Dados</h3>
+        <div class="icon-row">
+          <div class="tech glow" title="Node.js"><img src="https://cdn.simpleicons.org/nodedotjs/a78bfa" alt="Node.js"><span>Node.js</span></div>
+          <div class="tech glow" title="Express"><img src="https://cdn.simpleicons.org/express/a78bfa" alt="Express"><span>Express</span></div>
+          <div class="tech glow" title="Firebase / Firestore"><img src="https://cdn.simpleicons.org/firebase/a78bfa" alt="Firebase"><span>Firebase</span></div>
+          <div class="tech glow" title="Supabase"><img src="https://cdn.simpleicons.org/supabase/a78bfa" alt="Supabase"><span>Supabase</span></div>
+        </div>
+      </div>
+      <div class="skill-group reveal">
+        <h3>Mobile</h3>
+        <div class="icon-row">
+          <div class="tech glow" title="React Native"><img src="https://cdn.simpleicons.org/react/a78bfa" alt="React Native"><span>React Native</span></div>
+          <div class="tech glow" title="Expo"><img src="https://cdn.simpleicons.org/expo/a78bfa" alt="Expo"><span>Expo</span></div>
+        </div>
+      </div>
+      <div class="skill-group reveal">
+        <h3>Jogos &amp; Automação</h3>
+        <div class="icon-row">
+          <div class="tech glow" title="Godot Engine"><img src="https://cdn.simpleicons.org/godotengine/a78bfa" alt="Godot Engine"><span>Godot</span></div>
+          <div class="tech glow" title="Python"><img src="https://cdn.simpleicons.org/python/a78bfa" alt="Python"><span>Python</span></div>
+        </div>
+      </div>
+      <div class="skill-group reveal">
+        <h3>Ferramentas</h3>
+        <div class="icon-row">
+          <div class="tech glow" title="Git"><img src="https://cdn.simpleicons.org/git/a78bfa" alt="Git"><span>Git</span></div>
+          <div class="tech glow" title="GitHub"><img src="https://cdn.simpleicons.org/github/a78bfa" alt="GitHub"><span>GitHub</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="projetos">
+    <div class="section-head reveal">
+      <p class="section-kicker">Projetos</p>
+      <h2>Estudo de caso</h2>
+    </div>
+
+    <article class="case-study case-study--stacked reveal glow">
+      <div class="case-content">
+        <span class="case-tag">Produto em produção · Lumikode</span>
+        <h3>Cisne Branco — gestão de encomendas de condomínio</h3>
+        <p class="case-summary">
+          Sistema completo para a portaria de um condomínio controlar a entrada e
+          retirada de encomendas: da leitura do código de barras até a assinatura
+          do morador. Em produção desde 2026-06-05, hoje na versão 2.4.0.
+        </p>
+
+        <div class="chip-row">
+          <span class="chip chip-alt">JavaScript</span>
+          <span class="chip chip-alt">Firebase Firestore</span>
+          <span class="chip chip-alt">Firebase Hosting</span>
+          <span class="chip chip-alt">SheetJS</span>
+        </div>
+
+        <ul class="case-features">
+          <li>Três perfis de acesso (administrador, funcionário e scanner), cada um com interface própria.</li>
+          <li>Sincronização em tempo real entre dispositivos via <code>onSnapshot</code> do Firestore.</li>
+          <li>Bipagem de encomendas com checagem de duplicidade e exportação de relatórios em Excel e PDF.</li>
+          <li>Ranking de produtividade da equipe e dashboard com pendências mais antigas.</li>
+          <li>Sistema de versionamento próprio, com aviso automático de atualização para os clientes.</li>
+        </ul>
+
+        <div class="case-actions">
+          <a href="https://cisne-branco.web.app" target="_blank" rel="noopener" class="btn btn-primary btn-small">Ver site em produção</a>
+          <a href="https://github.com/Kadilaque/projeto-cisne" target="_blank" rel="noopener" class="btn btn-outline btn-small">Ver código</a>
+        </div>
+      </div>
+
+      <div class="case-visual">
+        <p class="demo-label">Experimente abaixo — ambiente isolado com dados fictícios, sem qualquer ligação com o banco de dados real do condomínio.</p>
+        <div class="browser-mock">
+          <div class="browser-bar">
+            <span class="browser-dot"></span>
+            <span class="browser-dot"></span>
+            <span class="browser-dot"></span>
+            <span class="browser-url">demo · cisne-branco</span>
+            <button type="button" id="demo-fullscreen" class="browser-fullscreen" title="Expandir para tela cheia">⛶ Tela cheia</button>
+            <a href="cisne-demo/index.html" target="_blank" rel="noopener" class="browser-newtab">nova aba ↗</a>
+          </div>
+          <div class="demo-creds">
+            <span>Acesso de teste:</span>
+            <code>visitante</code>
+            <code>demo</code>
+          </div>
+          <div class="demo-stage">
+            <div class="demo-start" id="demo-start">
+              <p>Demo interativo com dados fictícios — nada aqui toca o sistema real.</p>
+              <button type="button" class="btn btn-primary btn-small" id="demo-load">▶ Iniciar demo</button>
+            </div>
+            <iframe
+              class="demo-frame"
+              id="demo-iframe"
+              title="Demo Cisne Branco"
+              data-src="cisne-demo/index.html"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+              referrerpolicy="no-referrer"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <div class="more-projects reveal">
+      <p>Mais estudos de caso em construção.</p>
+      <a href="https://github.com/Kadilaque" target="_blank" rel="noopener" class="btn btn-outline btn-small">Ver todos os repositórios</a>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="lumikode">
+    <div class="section-head reveal">
+      <p class="section-kicker">Empresa</p>
+      <h2>Lumikode</h2>
+    </div>
+
+    <div class="lumi-card reveal glow">
+      <div class="lumi-text">
+        <div class="lumi-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21h6M10 21l1-13h2l1 13"/>
+            <path d="M10.5 8h3l-.5-3h-2z"/>
+            <path d="M12 3v2"/>
+            <path d="m6.5 6.5 2 1.5M17.5 6.5l-2 1.5"/>
+            <path d="M4 9.5 8 12M20 9.5 16 12"/>
+          </svg>
+        </div>
+        <p>
+          Faço parte da <strong>Lumikode</strong>, empresa de desenvolvimento e soluções
+          tecnológicas fundada em 2026. Transformamos ideias em produtos digitais —
+          sistemas web, aplicativos e integrações sob medida — com foco em qualidade
+          e resultado concreto para o cliente.
+        </p>
+        <p>
+          O Cisne Branco, mostrado acima, é uma entrega da Lumikode que está em
+          produção atendendo um condomínio real todos os dias.
+        </p>
+        <a href="https://lumikode.com.br" target="_blank" rel="noopener" class="btn btn-outline btn-small">lumikode.com.br ↗</a>
+      </div>
+      <div class="lumi-stats">
+        <div class="lumi-stat">
+          <span class="lumi-stat-num">2026</span>
+          <span class="lumi-stat-label">Ano de fundação</span>
+        </div>
+        <div class="lumi-stat">
+          <span class="lumi-stat-num">2+</span>
+          <span class="lumi-stat-label">Projetos entregues</span>
+        </div>
+        <div class="lumi-stat">
+          <span class="lumi-stat-num">3</span>
+          <span class="lumi-stat-label">Áreas de atuação</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section contact-section" id="contato">
+    <div class="contact-inner reveal">
+      <p class="section-kicker">Contato</p>
+      <h2>Vamos conversar?</h2>
+      <p class="contact-text">
+        Estou em busca de estágio e aberto a novas oportunidades e colaborações.
+        Me chama por qualquer um dos canais abaixo.
+      </p>
+      <div class="contact-actions">
+        <a href="mailto:angel.marciogabriel2304@gmail.com" class="icon-btn" title="E-mail" aria-label="Enviar e-mail">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2.5" y="5" width="19" height="14" rx="2.5"/>
+            <path d="m3 6.5 9 6.5 9-6.5"/>
+          </svg>
+        </a>
+        <a href="https://github.com/Kadilaque" target="_blank" rel="noopener" class="icon-btn" title="GitHub" aria-label="Perfil no GitHub">
+          <img src="https://cdn.simpleicons.org/github/a78bfa" alt="GitHub">
+        </a>
+        <a href="https://www.linkedin.com/in/márcio-gabriel-xavier-vieira-2462922b0" target="_blank" rel="noopener" class="icon-btn" title="LinkedIn" aria-label="Perfil no LinkedIn">
+          <svg viewBox="0 0 24 24" fill="#a78bfa">
+            <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/>
+          </svg>
+        </a>
+      </div>
+      <p class="contact-email">ou escreva direto: <a href="mailto:angel.marciogabriel2304@gmail.com">angel.marciogabriel2304@gmail.com</a></p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>Márcio Gabriel Vieira — feito à mão, sem template.</p>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>
