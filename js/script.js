@@ -19,15 +19,15 @@ const revealObserver = new IntersectionObserver(
 );
 revealEls.forEach((el) => revealObserver.observe(el));
 
-// Load the demo only when the visitor asks for it
-const demoLoadBtn = document.getElementById("demo-load");
-if (demoLoadBtn) {
-  demoLoadBtn.addEventListener("click", () => {
-    const frame = document.getElementById("demo-iframe");
+// Load each demo only when the visitor asks for it
+document.querySelectorAll(".demo-load-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const stage = btn.closest(".demo-stage");
+    const frame = stage.querySelector(".demo-frame");
     if (frame && !frame.src) frame.src = frame.dataset.src;
-    document.getElementById("demo-start").classList.add("hidden");
+    stage.querySelector(".demo-start").classList.add("hidden");
   });
-}
+});
 
 // Spotlight that follows the mouse on cards
 document.querySelectorAll(".glow").forEach((el) => {
@@ -38,16 +38,16 @@ document.querySelectorAll(".glow").forEach((el) => {
   });
 });
 
-// Fullscreen button for the live demo
-const fsBtn = document.getElementById("demo-fullscreen");
-if (fsBtn) {
+// Fullscreen buttons for the live demos
+document.querySelectorAll(".browser-fullscreen").forEach((fsBtn) => {
   fsBtn.addEventListener("click", () => {
-    const frame = document.querySelector(".demo-frame");
+    const mock = fsBtn.closest(".browser-mock");
+    const frame = mock && mock.querySelector(".demo-frame");
     if (frame && frame.requestFullscreen) {
       frame.requestFullscreen();
     }
   });
-}
+});
 
 // Typewriter effect for hero role
 const roles = ["Full Stack", "Front-end", "Back-end", "Mobile", "de Jogos"];

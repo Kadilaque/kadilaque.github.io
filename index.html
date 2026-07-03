@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=2">
 </head>
 <body>
 
@@ -59,6 +59,7 @@
       <div class="hero-actions">
         <a href="#projetos" class="btn btn-primary">Ver projetos</a>
         <a href="#contato" class="btn btn-outline">Entrar em contato</a>
+        <a href="assets/curriculo-marcio-gabriel-xavier-vieira.pdf" download class="btn btn-outline">Baixar CV ↓</a>
       </div>
     </div>
 
@@ -167,7 +168,7 @@
   <section class="section" id="projetos">
     <div class="section-head reveal">
       <p class="section-kicker">Projetos</p>
-      <h2>Estudo de caso</h2>
+      <h2>Estudos de caso</h2>
     </div>
 
     <article class="case-study case-study--stacked reveal glow">
@@ -220,7 +221,7 @@
           <div class="demo-stage">
             <div class="demo-start" id="demo-start">
               <p>Demo interativo com dados fictícios — nada aqui toca o sistema real.</p>
-              <button type="button" class="btn btn-primary btn-small" id="demo-load">▶ Iniciar demo</button>
+              <button type="button" class="btn btn-primary btn-small demo-load-btn">▶ Iniciar demo</button>
             </div>
             <iframe
               class="demo-frame"
@@ -228,6 +229,62 @@
               title="Demo Cisne Branco"
               data-src="cisne-demo/index.html"
               sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+              referrerpolicy="no-referrer"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="case-study reveal glow">
+      <div class="case-content">
+        <span class="case-tag">Site no ar · Cliente real</span>
+        <h3>Landing page — consultório médico</h3>
+        <p class="case-summary">
+          Página institucional para especialista em medicina ortomolecular, do briefing
+          à entrega final: identidade visual própria, seções de serviços e abordagem,
+          vídeo e chamada para agendamento. Publicada em domínio próprio da cliente.
+        </p>
+
+        <div class="chip-row">
+          <span class="chip chip-alt">HTML5</span>
+          <span class="chip chip-alt">CSS3</span>
+          <span class="chip chip-alt">JavaScript</span>
+          <span class="chip chip-alt">Design responsivo</span>
+        </div>
+
+        <ul class="case-features">
+          <li>Layout sob medida com a identidade da profissional (tipografia serifada, tom clínico e acolhedor).</li>
+          <li>Navegação suave entre seções e menu adaptado para celular.</li>
+          <li>Chamada para agendamento de consulta integrada ao WhatsApp.</li>
+          <li>Do briefing com a cliente à publicação no domínio próprio.</li>
+        </ul>
+
+        <div class="case-actions">
+          <a href="https://dramarcelinanogueira.com" target="_blank" rel="noopener" class="btn btn-primary btn-small">Ver site no ar</a>
+        </div>
+      </div>
+
+      <div class="case-visual">
+        <div class="browser-mock">
+          <div class="browser-bar">
+            <span class="browser-dot"></span>
+            <span class="browser-dot"></span>
+            <span class="browser-dot"></span>
+            <span class="browser-url">dramarcelinanogueira.com</span>
+            <button type="button" class="browser-fullscreen" title="Expandir para tela cheia">⛶ Tela cheia</button>
+            <a href="https://dramarcelinanogueira.com" target="_blank" rel="noopener" class="browser-newtab">nova aba ↗</a>
+          </div>
+          <div class="demo-stage">
+            <div class="demo-start">
+              <p>Preview ao vivo do site publicado.</p>
+              <button type="button" class="btn btn-primary btn-small demo-load-btn">▶ Ver ao vivo</button>
+            </div>
+            <iframe
+              class="demo-frame demo-frame--sm"
+              title="Site Dra. Marcelina Nogueira"
+              data-src="https://dramarcelinanogueira.com"
+              sandbox="allow-scripts allow-same-origin allow-popups"
               referrerpolicy="no-referrer"
             ></iframe>
           </div>
@@ -312,6 +369,7 @@
         </a>
       </div>
       <p class="contact-email">ou escreva direto: <a href="mailto:angel.marciogabriel2304@gmail.com">angel.marciogabriel2304@gmail.com</a></p>
+      <p class="contact-email"><a href="assets/curriculo-marcio-gabriel-xavier-vieira.pdf" download class="btn btn-outline btn-small">Baixar currículo (PDF) ↓</a></p>
     </div>
   </section>
 
@@ -321,6 +379,6 @@
   <p>Márcio Gabriel Vieira — feito à mão, sem template.</p>
 </footer>
 
-<script src="js/script.js"></script>
+<script src="js/script.js?v=2"></script>
 </body>
 </html>
