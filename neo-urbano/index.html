@@ -3,45 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEO-URBANO RPG | Sistema de Fichas</title>
+    <title>CyberPunk 2053 | Sistema de Fichas</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Efeitos cyberpunk globais: scanlines + grid -->
+    <div class="fx-cyber" aria-hidden="true"></div>
+
     <!-- Overlay para modais -->
     <div id="overlay-fichas" class="overlay-fichas"></div>
     
-    <!-- Tela 1: Introdução -->
+    <!-- Tela 1: Introdução (boot de terminal) -->
     <div id="tela-intro" class="tela ativa">
         <div class="container-intro">
-            <div class="glitch-container">
-                <h1 class="titulo-principal"><span class="destaque-azul">NEO</span>-URBANO</h1>
-                <h2 class="subtitulo-principal">SISTEMA DE FICHAS</h2>
+            <div class="intro-boot" id="intro-boot">
+                <div class="terminal">
+                    <div class="terminal-barra">
+                        <span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span>
+                        <span class="term-titulo">NET-OS // 2053</span>
+                    </div>
+                    <div class="terminal-corpo" id="terminal-corpo"></div>
+                    <div class="terminal-skip" id="terminal-skip">clique para pular ▸</div>
+                </div>
+
+                <div class="intro-menu" id="intro-menu">
+                    <div class="intro-logo">
+                        <h1 class="titulo-principal"><span class="destaque-magenta">CYBER</span><span class="destaque-ciano2">PUNK</span></h1>
+                        <div class="intro-ano">2053</div>
+                        <p class="subtitulo-principal">SISTEMA DE FICHAS</p>
+                    </div>
+
+                    <button id="btn-iniciar" class="btn-principal btn-grande">
+                        <i class="fas fa-terminal"></i> ENTRAR NA REDE
+                    </button>
+
+                    <div class="acoes-inicio">
+                        <button id="btn-carregar-ficha-inicio" class="btn-secundario">
+                            <i class="fas fa-folder-open"></i> CARREGAR FICHA
+                        </button>
+                        <button id="btn-gerenciar-fichas" class="btn-secundario">
+                            <i class="fas fa-cog"></i> GERENCIAR
+                        </button>
+                    </div>
+
+                    <div class="status-bar">
+                        <div class="status-item">
+                            <i class="fas fa-database"></i>
+                            <span>FICHAS: <span id="contador-fichas" class="destaque-ciano2">0</span></span>
+                        </div>
+                        <div class="status-item">
+                            <i class="fas fa-code-branch"></i>
+                            <span>VERSÃO: <span class="destaque-ciano2">4.0</span></span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="caixa-descricao">
-                <div class="scanline"></div>
-                <p class="texto-descricao"><span class="destaque-ciano">>>></span> UMA CIDADE ONDE A CARNE SE FUNDE COM O SILÍCIO</p>
-                <p class="texto-descricao"><span class="destaque-ciano">>>></span> SUA SOBREVIVÊNCIA É MEDIDA EM CRÉDITOS, BALAS E DECISÕES</p>
-                <p class="texto-descricao"><span class="destaque-ciano">>>></span> A ZONA CINZA AGUARDA...</p>
-                <div class="terminal-cursor"></div>
-            </div>
-            
-            <button id="btn-iniciar" class="btn-principal">
-                <span class="btn-texto">>> INICIAR SISTEMA</span>
-                <span class="btn-glow"></span>
-            </button>
-            
-            <div class="acoes-inicio">
-                <button id="btn-carregar-ficha-inicio" class="btn-secundario">
-                    <i class="fas fa-folder-open"></i> CARREGAR FICHA SALVA
-                </button>
-                <button id="btn-gerenciar-fichas" class="btn-secundario">
-                    <i class="fas fa-cog"></i> GERENCIAR FICHAS
-                </button>
-            </div>
-            
+
             <!-- Container de Fichas Salvas (modal) -->
             <div id="modal-fichas-inicio" class="fichas-salvas-container">
                 <div class="fichas-salvas-header">
@@ -64,17 +83,6 @@
                     <button class="btn-pequeno" id="btn-remover-todas-fichas" style="display: none;">
                         <i class="fas fa-trash-alt"></i> Remover Todas
                     </button>
-                </div>
-            </div>
-
-            <div class="status-bar">
-                <div class="status-item">
-                    <i class="fas fa-database"></i>
-                    <span>FICHAS: <span id="contador-fichas" class="destaque-ciano">0</span></span>
-                </div>
-                <div class="status-item">
-                    <i class="fas fa-code-branch"></i>
-                    <span>VERSÃO: <span class="destaque-ciano">3.0</span></span>
                 </div>
             </div>
         </div>
@@ -171,7 +179,7 @@
                     <div class="tela-numero">03</div>
                     <h2><i class="fas fa-sliders-h"></i> <span class="destaque-azul">ATRIBUTOS</span> BÁSICOS</h2>
                 </div>
-                <p class="subtitulo">6 PONTOS PARA DISTRIBUIR (MÍNIMO: 1, MÁXIMO: 5 POR ATRIBUTO)</p>
+                <p class="subtitulo">7 PONTOS PARA DISTRIBUIR (MÍNIMO: 1, MÁXIMO: 5 POR ATRIBUTO)</p>
                 
                 <div class="progresso">
                     <div class="passo concluido"><span>ORIGEM</span></div>
@@ -185,7 +193,7 @@
 
             <div class="atributos-container">
                 <div class="pontos-restantes" id="pontos-restantes">
-                    <div class="pontos-numero">6</div>
+                    <div class="pontos-numero">7</div>
                     <div class="pontos-texto">PONTOS DISPONÍVEIS</div>
                 </div>
 
@@ -325,12 +333,21 @@
 
     <!-- Tela 7: Ficha Final -->
     <div id="tela-ficha" class="tela">
+        <!-- Animação de boot ao abrir a ficha -->
+        <div class="boot-overlay escondido" id="boot-overlay" aria-hidden="true">
+            <div class="boot-texto">
+                <span class="boot-linha">&gt; INICIALIZANDO NEURO-LINK...</span>
+                <span class="boot-linha">&gt; CARREGANDO FICHA DO OPERADOR...</span>
+                <span class="boot-linha">&gt; ACESSO CONCEDIDO<span class="boot-cursor">_</span></span>
+            </div>
+        </div>
+
         <div class="container-ficha">
             <!-- Cabeçalho da Ficha -->
             <div class="ficha-header">
                 <div class="ficha-titulo">
                     <h1><i class="fas fa-file-contract"></i> FICHA DE <span class="destaque-azul">PERSONAGEM</span></h1>
-                    <div class="ficha-subtitulo">NEO-URBANO RPG | SISTEMA 3.0</div>
+                    <div class="ficha-subtitulo">CYBERPUNK 2053 | SISTEMA 3.0</div>
                 </div>
                 
                 <div class="ficha-meta">
@@ -354,6 +371,12 @@
                     <button id="btn-carregar-ficha" class="btn-ficha">
                         <i class="fas fa-folder-open"></i> CARREGAR
                     </button>
+                    <button id="btn-nuvem" class="btn-ficha">
+                        <i class="fas fa-cloud"></i> NUVEM
+                    </button>
+                    <button id="btn-personalizar" class="btn-ficha">
+                        <i class="fas fa-palette"></i> PERSONALIZAR
+                    </button>
                 </div>
                 
                 <div class="controles-direita">
@@ -366,41 +389,38 @@
                 </div>
             </div>
 
-            <!-- Conteúdo da Ficha -->
-            <div class="ficha-content">
-                <!-- Coluna Esquerda - Identificação & Status -->
-                <div class="ficha-col esquerda">
-                    <!-- Identificação -->
-                    <div class="ficha-card">
-                        <div class="card-header">
-                            <i class="fas fa-id-card"></i>
-                            <h3>IDENTIFICAÇÃO</h3>
+            <!-- Cartão de ID (retrato + status) -->
+            <div class="idcard">
+                <div class="idcard-foto" id="idcard-foto" title="Clique para trocar a foto">
+                    <i class="fas fa-user-astronaut"></i>
+                </div>
+                <div class="idcard-central">
+                    <input type="text" id="idcard-nome" class="idcard-nome" placeholder="NOME DO PERSONAGEM" maxlength="30" autocomplete="off">
+                    <div class="idcard-tags">
+                        <span class="idcard-tag"><i class="fas fa-chess-queen"></i> <span id="idcard-classe">—</span></span>
+                        <span class="idcard-tag"><i class="fas fa-id-badge"></i> <span id="idcard-origem">—</span></span>
+                        <span class="idcard-tag"><i class="fas fa-star"></i> Nível <b id="idcard-nivel">1</b> · XP <span id="idcard-xp">0/100</span></span>
+                    </div>
+                    <div class="idcard-barras">
+                        <div class="hud-barra" id="hud-vida-wrap">
+                            <div class="hud-barra-top"><span><i class="fas fa-heart"></i> VIDA</span><span id="hud-vida-txt">10/10</span></div>
+                            <div class="hud-barra-trilha"><div class="hud-barra-fill vida" id="hud-vida-fill"></div></div>
                         </div>
-                        <div class="card-content">
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <span class="info-label">NOME</span>
-                                    <span id="ficha-nome" class="info-valor">---</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">CLASSE</span>
-                                    <span id="ficha-classe" class="info-valor">---</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">ORIGEM</span>
-                                    <span id="ficha-origem" class="info-valor">---</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">NÍVEL</span>
-                                    <div class="nivel-container">
-                                        <span id="ficha-nivel" class="info-valor destaque-azul">1</span>
-                                        <span class="nivel-xp">XP: <span id="ficha-xp">0</span>/100</span>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="hud-barra" id="hud-energia-wrap">
+                            <div class="hud-barra-top"><span><i class="fas fa-bolt"></i> ENERGIA</span><span id="hud-energia-txt">8/8</span></div>
+                            <div class="hud-barra-trilha"><div class="hud-barra-fill energia" id="hud-energia-fill"></div></div>
                         </div>
                     </div>
+                </div>
+                <div class="idcard-emblema" id="idcard-emblema" title="Classe">
+                    <i class="fas fa-user-secret"></i>
+                </div>
+            </div>
 
+            <!-- Conteúdo da Ficha -->
+            <div class="ficha-content">
+                <!-- Coluna Esquerda - Status -->
+                <div class="ficha-col esquerda">
                     <!-- Status Básicos -->
                     <div class="ficha-card">
                         <div class="card-header">
@@ -587,6 +607,34 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Detalhes Pessoais -->
+                    <div class="ficha-card">
+                        <div class="card-header">
+                            <i class="fas fa-user-circle"></i>
+                            <h3>DETALHES PESSOAIS</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="detalhes-grid">
+                                <div class="detalhe-item">
+                                    <span class="detalhe-label">IDADE</span>
+                                    <span id="detalhe-idade" class="detalhe-valor">--</span>
+                                </div>
+                                <div class="detalhe-item">
+                                    <span class="detalhe-label">ALTURA</span>
+                                    <span id="detalhe-altura" class="detalhe-valor">-- cm</span>
+                                </div>
+                                <div class="detalhe-item">
+                                    <span class="detalhe-label">APARÊNCIA</span>
+                                    <span id="detalhe-aparencia" class="detalhe-valor">--</span>
+                                </div>
+                            </div>
+                            <div class="detalhe-historia">
+                                <div class="detalhe-label">HISTÓRIA</div>
+                                <div id="detalhe-historia" class="detalhe-valor">--</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Coluna Central - Atributos & Perícias -->
@@ -643,6 +691,25 @@
                         </div>
                     </div>
 
+                    <!-- Maestrias de Armas -->
+                    <div class="ficha-card">
+                        <div class="card-header">
+                            <i class="fas fa-crosshairs"></i>
+                            <h3>MAESTRIAS DE ARMAS</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="maestria-tabs" id="maestria-tabs">
+                                <!-- Abas geradas por JS -->
+                            </div>
+                            <div id="maestria-conteudo" class="maestria-conteudo">
+                                <!-- Conteúdo gerado por JS -->
+                            </div>
+                            <div class="maestria-info-rodape">
+                                <i class="fas fa-circle-info"></i> As maestrias evoluem conforme o uso ao longo da história.
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Habilidades Resumo -->
                     <div class="ficha-card">
                         <div class="card-header">
@@ -681,70 +748,71 @@
                             <h3>INVENTÁRIO</h3>
                         </div>
                         <div class="card-content">
-                            <div class="inventario-padrao" id="inventario-padrao">
-                                <div class="inventario-item" data-item="Colete Leve">
-                                    <i class="fas fa-shield-alt"></i> Colete Leve
-                                </div>
-                                <div class="inventario-item" data-item="Comunicador">
-                                    <i class="fas fa-mobile-alt"></i> Comunicador
-                                </div>
-                                <div class="inventario-item" data-item="Kit Básico">
-                                    <i class="fas fa-tools"></i> Kit Básico
-                                </div>
+                            <div id="inventario-personalizado" class="inventario-lista">
+                                <!-- Itens aparecerão aqui -->
                             </div>
-                            
-                            <div id="inventario-personalizado">
-                                <!-- Itens personalizados aparecerão aqui -->
-                            </div>
-                            
+
                             <div class="controles-inventario">
                                 <button class="btn-inventario adicionar" id="btn-adicionar-item">
                                     <i class="fas fa-plus"></i> Adicionar Item
                                 </button>
-                                <button class="btn-inventario remover" id="btn-remover-item">
-                                    <i class="fas fa-minus"></i> Remover Item
-                                </button>
                             </div>
-                            
-                            <textarea id="area-inventario" class="ficha-textarea" placeholder="Adicione notas sobre o inventário, descrições detalhadas, etc... (salva automaticamente)"></textarea>
+
+                            <textarea id="area-inventario" class="ficha-textarea" placeholder="Anotações sobre o inventário, descrições detalhadas, etc... (salva automaticamente)"></textarea>
                         </div>
                     </div>
 
-                    <!-- Implantes/Cyberware -->
+                    <!-- Implantes / Corpo -->
                     <div class="ficha-card">
                         <div class="card-header">
                             <i class="fas fa-microchip"></i>
                             <h3>IMPLANTES / CYBERWARE</h3>
                         </div>
-                        <div class="card-content">
-                            <textarea id="area-implantes" class="ficha-textarea" placeholder="Descreva seus implantes cibernéticos, melhorias, modificações... (salva automaticamente)"></textarea>
-                        </div>
-                    </div>
-
-                    <!-- Detalhes Pessoais -->
-                    <div class="ficha-card">
-                        <div class="card-header">
-                            <i class="fas fa-user-circle"></i>
-                            <h3>DETALHES PESSOAIS</h3>
-                        </div>
-                        <div class="card-content">
-                            <div class="detalhes-grid">
-                                <div class="detalhe-item">
-                                    <span class="detalhe-label">IDADE</span>
-                                    <span id="detalhe-idade" class="detalhe-valor">--</span>
+                        <div class="card-content corpo-card-content">
+                            <div class="corpo-wrap">
+                                <div class="corpo-figura">
+                                    <svg id="corpo-svg" viewBox="0 0 240 484" xmlns="http://www.w3.org/2000/svg" aria-label="Corpo do personagem">
+                                        <defs>
+                                            <linearGradient id="corpoGrad" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0" stop-color="#3aa0e0"/>
+                                                <stop offset="1" stop-color="#124a86"/>
+                                            </linearGradient>
+                                            <filter id="corpoGlow" x="-35%" y="-25%" width="170%" height="150%">
+                                                <feDropShadow dx="0" dy="0" stdDeviation="3.5" flood-color="#3ad2ff" flood-opacity="0.85"/>
+                                            </filter>
+                                        </defs>
+                                        <!-- Silhueta (metade direita + espelho) -->
+                                        <g class="corpo-silhueta" filter="url(#corpoGlow)">
+                                            <path d="M120,12 C139,12 153,29 153,49 C153,66 145,74 135,78 L136,94 C151,98 169,103 185,117 C194,125 198,136 199,148 C203,168 203,190 200,210 C198,222 196,230 194,236 C198,244 201,252 200,260 C200,268 195,273 190,271 C191,276 186,277 183,272 C182,277 178,277 176,271 C173,274 169,272 168,265 C166,258 169,250 174,244 C178,230 180,206 180,182 C179,167 174,156 166,151 C161,148 156,148 152,150 C156,178 158,208 157,234 C156,242 157,248 160,252 C167,288 167,332 163,376 C161,406 157,436 154,452 C152,459 154,465 162,465 C174,467 182,464 182,456 C182,451 178,448 171,448 L146,448 C144,420 146,376 148,332 C149,302 149,276 145,262 L120,252 Z"/>
+                                            <path d="M120,12 C139,12 153,29 153,49 C153,66 145,74 135,78 L136,94 C151,98 169,103 185,117 C194,125 198,136 199,148 C203,168 203,190 200,210 C198,222 196,230 194,236 C198,244 201,252 200,260 C200,268 195,273 190,271 C191,276 186,277 183,272 C182,277 178,277 176,271 C173,274 169,272 168,265 C166,258 169,250 174,244 C178,230 180,206 180,182 C179,167 174,156 166,151 C161,148 156,148 152,150 C156,178 158,208 157,234 C156,242 157,248 160,252 C167,288 167,332 163,376 C161,406 157,436 154,452 C152,459 154,465 162,465 C174,467 182,464 182,456 C182,451 178,448 171,448 L146,448 C144,420 146,376 148,332 C149,302 149,276 145,262 L120,252 Z" transform="translate(240,0) scale(-1,1)"/>
+                                        </g>
+                                        <!-- Regiões clicáveis (transparentes, por cima da silhueta) -->
+                                        <g class="corpo-regiao" data-regiao="cabeca">
+                                            <ellipse cx="120" cy="46" rx="31" ry="37"/>
+                                        </g>
+                                        <g class="corpo-regiao" data-regiao="torax">
+                                            <rect x="86" y="90" width="68" height="150" rx="24"/>
+                                        </g>
+                                        <g class="corpo-regiao" data-regiao="bracos">
+                                            <ellipse cx="55" cy="194" rx="22" ry="84"/>
+                                            <ellipse cx="185" cy="194" rx="22" ry="84"/>
+                                        </g>
+                                        <g class="corpo-regiao" data-regiao="maos">
+                                            <ellipse cx="55" cy="258" rx="20" ry="25"/>
+                                            <ellipse cx="185" cy="258" rx="20" ry="25"/>
+                                        </g>
+                                        <g class="corpo-regiao" data-regiao="pernas">
+                                            <ellipse cx="98" cy="364" rx="26" ry="108"/>
+                                            <ellipse cx="142" cy="364" rx="26" ry="108"/>
+                                        </g>
+                                    </svg>
                                 </div>
-                                <div class="detalhe-item">
-                                    <span class="detalhe-label">ALTURA</span>
-                                    <span id="detalhe-altura" class="detalhe-valor">-- cm</span>
-                                </div>
-                                <div class="detalhe-item">
-                                    <span class="detalhe-label">APARÊNCIA</span>
-                                    <span id="detalhe-aparencia" class="detalhe-valor">--</span>
+                                <div class="corpo-painel" id="corpo-painel">
+                                    <div class="corpo-painel-vazio"><i class="fas fa-hand-pointer"></i> Clique em uma parte do corpo para ver e adicionar implantes.</div>
                                 </div>
                             </div>
-                            <div class="detalhe-historia">
-                                <div class="detalhe-label">HISTÓRIA</div>
-                                <div id="detalhe-historia" class="detalhe-valor">--</div>
+                            <div class="corpo-legenda" id="corpo-legenda">
+                                <!-- Botões de região gerados por JS -->
                             </div>
                         </div>
                     </div>
@@ -754,6 +822,9 @@
                         <div class="card-header">
                             <i class="fas fa-sitemap"></i>
                             <h3>ÁRVORE DE HABILIDADES</h3>
+                            <button id="btn-expandir-arvore" class="btn-expandir" title="Expandir em tela cheia" aria-label="Expandir árvore">
+                                <i class="fas fa-expand"></i>
+                            </button>
                         </div>
                         <div class="card-content">
                             <div class="habilidades-tabs" id="habilidades-tabs">
@@ -786,7 +857,7 @@
             <!-- Rodapé da Ficha -->
             <div class="ficha-footer">
                 <div class="footer-left">
-                    <i class="fas fa-terminal"></i> SISTEMA NEO-URBANO RPG v3.0
+                    <i class="fas fa-terminal"></i> SISTEMA CYBERPUNK 2053 v3.0
                 </div>
                 <div class="footer-right">
                     ÚLTIMA ATUALIZAÇÃO: <span id="ultima-atualizacao">--:--</span>
@@ -883,6 +954,146 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal de Adicionar Implante -->
+    <div id="modal-implante" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-microchip"></i> ADICIONAR IMPLANTE <span class="destaque-azul">— <span id="modal-implante-regiao">--</span></span></h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="input-implante-nome"><i class="fas fa-tag"></i> NOME DO IMPLANTE</label>
+                    <input type="text" id="input-implante-nome" placeholder="Ex: Olhos Cibernéticos Kiroshi" maxlength="40">
+                </div>
+                <div class="form-group">
+                    <label for="input-implante-desc"><i class="fas fa-align-left"></i> DESCRIÇÃO</label>
+                    <textarea id="input-implante-desc" rows="4" placeholder="O que o implante faz, bônus, efeitos colaterais..." maxlength="200"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-cancelar-implante" class="btn-secundario">CANCELAR</button>
+                <button id="btn-confirmar-implante" class="btn-principal">
+                    <i class="fas fa-check"></i> ADICIONAR
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Expandir Árvore de Habilidades -->
+    <div id="modal-arvore" class="modal">
+        <div class="modal-content modal-content-lg">
+            <div class="modal-header">
+                <h2><i class="fas fa-sitemap"></i> ÁRVORE DE <span class="destaque-azul">HABILIDADES</span></h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="habilidades-tabs" id="habilidades-tabs-modal">
+                    <!-- Abas geradas por JS -->
+                </div>
+                <div id="habilidades-conteudo-modal" class="habilidades-conteudo arvore-modal-conteudo">
+                    <!-- Conteúdo gerado por JS -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="arvore-modal-info">
+                    <i class="fas fa-star"></i> Pontos de habilidade disponíveis:
+                    <span id="arvore-modal-pontos" class="destaque-azul">0</span>
+                </div>
+                <button class="btn-principal modal-close"><i class="fas fa-check"></i> FECHAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input de foto (oculto) -->
+    <input type="file" id="input-foto" accept="image/*" style="display:none">
+
+    <!-- Modal Personalizar -->
+    <div id="modal-personalizar" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-palette"></i> PERSONALIZAR <span class="destaque-azul">FICHA</span></h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="pz-secao">
+                    <h3><i class="fas fa-image"></i> FOTO DO PERSONAGEM</h3>
+                    <div class="pz-foto-row">
+                        <div class="foto-preview" id="foto-preview"><i class="fas fa-user"></i></div>
+                        <div class="pz-foto-acoes">
+                            <button id="btn-escolher-foto" class="btn-principal"><i class="fas fa-upload"></i> Escolher imagem</button>
+                            <button id="btn-remover-foto" class="btn-secundario" style="display:none"><i class="fas fa-trash"></i> Remover</button>
+                            <div class="form-hint">A imagem é reduzida automaticamente e salva junto da ficha (vai pra nuvem também).</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pz-secao">
+                    <h3><i class="fas fa-droplet"></i> COR DA FICHA</h3>
+                    <div class="cor-temas" id="cor-temas"><!-- swatches gerados por JS --></div>
+                    <div class="pz-picker-row">
+                        <label for="cor-picker">Cor personalizada:</label>
+                        <input type="color" id="cor-picker" value="#00e0ff">
+                    </div>
+                    <div class="form-hint">A cor vira o neon que comanda a ficha inteira: bordas, ícones, barras e brilhos.</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-principal modal-close"><i class="fas fa-check"></i> PRONTO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal da Nuvem -->
+    <div id="modal-nuvem" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-cloud"></i> FICHAS NA <span class="destaque-azul">NUVEM</span></h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="nuvem-aviso-config" class="nuvem-aviso" style="display:none">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <span>Firebase ainda não configurado. Preencha <b>firebase-config.js</b> para ligar a nuvem. Enquanto isso, o app funciona normalmente offline.</span>
+                </div>
+
+                <div class="nuvem-mesa">
+                    <label for="input-mesa"><i class="fas fa-dungeon"></i> CÓDIGO DA MESA</label>
+                    <div class="nuvem-mesa-row">
+                        <input type="text" id="input-mesa" placeholder="ex: cisne-2053" maxlength="40" autocomplete="off">
+                        <button id="btn-salvar-mesa" class="btn-pequeno">Definir</button>
+                    </div>
+                    <div class="form-hint">Todos os jogadores da mesa usam o mesmo código. O mestre usa esse código para ver e editar todas as fichas.</div>
+                </div>
+
+                <div class="nuvem-acoes">
+                    <button id="btn-nuvem-salvar" class="btn-principal">
+                        <i class="fas fa-cloud-arrow-up"></i> Salvar esta ficha na nuvem
+                    </button>
+                    <button id="btn-nuvem-enviar-locais" class="btn-secundario">
+                        <i class="fas fa-upload"></i> Enviar minhas fichas locais
+                    </button>
+                </div>
+
+                <div class="nuvem-lista-header">
+                    <h3><i class="fas fa-users"></i> Fichas da mesa</h3>
+                    <span id="nuvem-status" class="nuvem-status">offline</span>
+                </div>
+                <div id="nuvem-lista" class="nuvem-lista">
+                    <div class="nuvem-vazio">Defina um código de mesa para ver as fichas.</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secundario modal-close">FECHAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase (nuvem) — SDK compat + configuração -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
 
     <script src="script.js"></script>
 </body>

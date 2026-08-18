@@ -29,10 +29,10 @@ const dadosSistema = {
             nome: "Mercenário", 
             icone: "fa-user-secret",
             descricao: "Vende habilidades por créditos. Lealdade tem preço.",
-            atributoChave: "Malandragem"
+            atributoChave: "Manha"
         },
-        { 
-            nome: "Motorista", 
+        {
+            nome: "Motorista",
             icone: "fa-car",
             descricao: "Conhece cada beco, atalho e rota de fuga da cidade.",
             atributoChave: "Foco"
@@ -41,19 +41,19 @@ const dadosSistema = {
             nome: "Fixer", 
             icone: "fa-handshake",
             descricao: "Conecta pessoas. Sabe quem tem o que você precisa.",
-            atributoChave: "Lábia"
+            atributoChave: "Proza"
         },
         { 
             nome: "Médico de Rua", 
             icone: "fa-user-md",
             descricao: "Cura com o que tem. Ético ou não, o importante é funcionar.",
-            atributoChave: "Recurso"
+            atributoChave: "Rede"
         },
         { 
             nome: "Hacker", 
             icone: "fa-code",
             descricao: "A realidade é apenas outro sistema para ser invadido.",
-            atributoChave: "Recurso"
+            atributoChave: "Rede"
         },
         { 
             nome: "Segurança de Boate", 
@@ -65,7 +65,7 @@ const dadosSistema = {
             nome: "Mecânico", 
             icone: "fa-tools",
             descricao: "Constrói, conserta, modifica. Tudo é matéria-prima.",
-            atributoChave: "Recurso"
+            atributoChave: "Rede"
         },
         { 
             nome: "Traficante", 
@@ -85,106 +85,217 @@ const dadosSistema = {
 };
 
 // ===== ÁRVORE DE HABILIDADES =====
+// Helper: monta uma habilidade padrão (passiva, verde) a partir de [id, nome, descricao]
+function hab(id, nome, descricao) {
+    return { id, nome, descricao, custo: "🟢", tipo: "passiva", cor: "verde" };
+}
+
 const habilidadesArvore = {
     carne: [
-        { 
-            id: "corpo_cascudo",
-            nome: "Corpo Cascudo", 
-            descricao: "Vida máxima +2.",
-            custo: "🟢",
-            tipo: "passiva",
-            cor: "verde"
-        },
-        { 
-            id: "aguentar_tranco",
-            nome: "Aguentar o Tranco", 
-            descricao: "Ignora a penalidade do primeiro Ferimento Leve.",
-            custo: "🟢",
-            tipo: "passiva",
-            cor: "verde"
-        },
-        { 
-            id: "pulmao_forte",
-            nome: "Pulmão Forte", 
-            descricao: "Energia máxima +1.",
-            custo: "🟢",
-            tipo: "passiva",
-            cor: "verde"
-        }
+        hab("casca_grossa", "Casca Grossa", "Aumenta a resistência contra danos físicos e reduz efeitos de ferimentos."),
+        hab("predador_urbano", "Predador Urbano", "Melhora combate corpo a corpo e capacidade de dominar inimigos menores."),
+        hab("segundo_folego", "Segundo Fôlego", "Permite recuperar energia em situações extremas."),
+        hab("dor_silenciosa", "Dor Silenciosa", "Reduz penalidades causadas por ferimentos."),
+        hab("brutalidade_controlada", "Brutalidade Controlada", "Transforma força física em ataques mais devastadores."),
+        hab("sobrevivente_nato", "Sobrevivente Nato", "Melhora testes de sobrevivência, fome, frio e condições ruins."),
+        hab("pulso_firme", "Pulso Firme", "Mantém controle físico sob pressão ou ameaça."),
+        hab("adrenalina", "Adrenalina", "Permite realizar ações extras quando está ferido ou em perigo."),
+        hab("muralha_humana", "Muralha Humana", "Protege aliados usando o próprio corpo."),
+        hab("resistencia_biologica", "Resistência Biológica", "Maior resistência contra venenos, doenças e drogas."),
+        hab("quebra_ossos", "Quebra Ossos", "Golpes físicos podem causar efeitos incapacitantes."),
+        hab("instinto_animal", "Instinto Animal", "Reage rapidamente antes que ameaças sejam percebidas."),
+        hab("limite_desconhecido", "Limite Desconhecido", "Ultrapassa temporariamente os limites físicos."),
+        hab("sobrevivencia_extrema", "Sobrevivência Extrema", "Consegue permanecer vivo em situações quase impossíveis."),
+        hab("ultimo_homem_vivo", "Último Homem Vivo", "Quando tudo parece perdido, seu corpo continua funcionando.")
     ],
-    malandragem: [
-        { 
-            id: "passos_leves",
-            nome: "Passos Leves", 
-            descricao: "Correr e fugir custam −1 Energia.",
-            custo: "🟢",
-            tipo: "passiva",
-            cor: "verde"
-        },
-        { 
-            id: "reflexos_treinados",
-            nome: "Reflexos Treinados", 
-            descricao: "+1 em Esquiva.",
-            custo: "🟢",
-            tipo: "passiva",
-            cor: "verde"
-        }
+    intuicao: [
+        hab("olhos_da_rua", "Olhos da Rua", "Percebe detalhes escondidos no ambiente."),
+        hab("leitura_corporal", "Leitura Corporal", "Identifica emoções, mentiras e intenções."),
+        hab("cacador_de_pistas", "Caçador de Pistas", "Melhora investigações."),
+        hab("perigo_antes_do_som", "Perigo Antes do Som", "Percebe ameaças antes que aconteçam."),
+        hab("memoria_fotografica", "Memória Fotográfica", "Lembra detalhes importantes."),
+        hab("instinto_de_sobrevivencia", "Instinto de Sobrevivência", "Toma melhores decisões em situações perigosas."),
+        hab("analista_de_campo", "Analista de Campo", "Entende padrões durante missões."),
+        hab("rastreador_urbano", "Rastreador Urbano", "Segue pessoas, veículos e informações."),
+        hab("ouvido_sensivel", "Ouvido Sensível", "Percebe sons, movimentos e alterações."),
+        hab("sexto_sentido", "Sexto Sentido", "Recebe sinais quando algo está errado."),
+        hab("mente_investigativa", "Mente Investigativa", "Conecta informações aparentemente aleatórias."),
+        hab("antecipacao", "Antecipação", "Prevê movimentos inimigos."),
+        hab("perfilador", "Perfilador", "Entende comportamento psicológico."),
+        hab("fantasma_da_rua", "Fantasma da Rua", "Sabe quando está sendo seguido."),
+        hab("visao_alem_do_obvio", "Visão Além do Óbvio", "Enxerga soluções que outros ignoram.")
     ],
     foco: [
-        { 
-            id: "mente_clara",
-            nome: "Mente Clara", 
-            descricao: "Ignora a primeira penalidade de Estresse.",
-            custo: "🟢",
-            tipo: "passiva",
-            cor: "verde"
-        },
-        { 
-            id: "atencao_total",
-            nome: "Atenção Total", 
-            descricao: "+1 em Investigação e Análise.",
-            custo: "🟢",
-            tipo: "passiva",
-            cor: "verde"
-        }
+        hab("mira_perfeita", "Mira Perfeita", "Melhora ataques à distância."),
+        hab("respiracao_controlada", "Respiração Controlada", "Mantém precisão sob pressão."),
+        hab("disciplina_de_ferro", "Disciplina de Ferro", "Resiste a distrações."),
+        hab("atirador_profissional", "Atirador Profissional", "Especialização em armas de fogo."),
+        hab("maos_rapidas", "Mãos Rápidas", "Recarga e ações rápidas."),
+        hab("golpe_calculado", "Golpe Calculado", "Ataques mais precisos contra pontos fracos."),
+        hab("controle_motor", "Controle Motor", "Melhora ações delicadas."),
+        hab("combate_tecnico", "Combate Técnico", "Usa técnicas avançadas de luta."),
+        hab("reacao_instantanea", "Reação Instantânea", "Melhora respostas defensivas."),
+        hab("especialista_em_armas", "Especialista em Armas", "Conhece funcionamento e manutenção."),
+        hab("duelo_urbano", "Duelo Urbano", "Especialista em confrontos individuais."),
+        hab("execucao_limpa", "Execução Limpa", "Finaliza inimigos rapidamente."),
+        hab("zona_de_concentracao", "Zona de Concentração", "Entra em estado de foco extremo."),
+        hab("mestre_da_precisao", "Mestre da Precisão", "Quase nunca desperdiça oportunidades."),
+        hab("a_ultima_bala", "A Última Bala", "Melhora quando está em situação crítica.")
     ],
-    labia: [
-        { 
-            id: "voz_peso",
-            nome: "Voz de Peso", 
-            descricao: "+1 em Persuasão ou Intimidação.",
-            custo: "🟢",
-            tipo: "passiva",
-            cor: "verde"
-        },
-        { 
-            id: "respeito_rua",
-            nome: "Respeito de Rua", 
-            descricao: "NPCs comuns evitam confronto direto.",
-            custo: "🟢",
-            tipo: "passiva",
-            cor: "verde"
-        }
+    manha: [
+        hab("maos_leves", "Mãos Leves", "Especialista em furtos pequenos."),
+        hab("rosto_desconhecido", "Rosto Desconhecido", "Passa despercebido em multidões."),
+        hab("mentiroso_convincente", "Mentiroso Convincente", "Melhora enganações."),
+        hab("gato_da_cidade", "Gato da Cidade", "Movimentação silenciosa."),
+        hab("mercado_negro", "Mercado Negro", "Conhece contatos ilegais."),
+        hab("arrombador", "Arrombador", "Abre fechaduras e sistemas físicos."),
+        hab("golpe_baixo", "Golpe Baixo", "Usa truques sujos em combate."),
+        hab("camaleao_social", "Camaleão Social", "Adapta comportamento rapidamente."),
+        hab("fuga_perfeita", "Fuga Perfeita", "Especialista em escapar."),
+        hab("contrabandista", "Contrabandista", "Transporta itens proibidos."),
+        hab("leitor_de_golpes", "Leitor de Golpes", "Reconhece armadilhas e fraudes."),
+        hab("rei_das_ruas", "Rei das Ruas", "Possui influência entre criminosos."),
+        hab("sobrevivencia_ilegal", "Sobrevivência Ilegal", "Consegue recursos onde ninguém consegue."),
+        hab("mestre_do_improviso", "Mestre do Improviso", "Transforma objetos comuns em ferramentas."),
+        hab("fantasma_criminal", "Fantasma Criminal", "Apaga rastros e identidades.")
     ],
-    recurso: [
-        { 
-            id: "interface_natural",
-            nome: "Interface Natural", 
-            descricao: "Você interage com sistemas e dispositivos sem penalidade, mesmo sob pressão.",
-            custo: "🟢",
-            tipo: "passiva",
-            cor: "verde"
-        },
-        { 
-            id: "leitura_sistema",
-            nome: "Leitura de Sistema", 
-            descricao: "+1 em ações de Hacking, Eletrônica ou Análise digital.",
-            custo: "🟢",
-            tipo: "passiva",
-            cor: "verde"
-        }
+    proza: [
+        hab("voz_marcante", "Voz Marcante", "Sua presença chama atenção."),
+        hab("negociador", "Negociador", "Melhora acordos."),
+        hab("mentira_perfeita", "Mentira Perfeita", "Cria histórias convincentes."),
+        hab("intimidador", "Intimidador", "Controla pessoas pelo medo."),
+        hab("lider_natural", "Líder Natural", "Inspira aliados."),
+        hab("diplomata", "Diplomata", "Resolve conflitos."),
+        hab("leitor_social", "Leitor Social", "Entende grupos e hierarquias."),
+        hab("manipulador", "Manipulador", "Controla conversas."),
+        hab("carisma_perigoso", "Carisma Perigoso", "Atrai aliados e inimigos."),
+        hab("informante", "Informante", "Consegue informações através de contatos."),
+        hab("sangue_frio", "Sangue Frio", "Mantém controle em discussões."),
+        hab("orador", "Orador", "Mobiliza grandes grupos."),
+        hab("psicologo_de_rua", "Psicólogo de Rua", "Entende traumas e emoções."),
+        hab("nome_conhecido", "Nome Conhecido", "Sua reputação abre portas."),
+        hab("lenda_viva", "Lenda Viva", "Sua presença muda decisões.")
+    ],
+    rede: [
+        hab("codigo_limpo", "Código Limpo", "Programação eficiente."),
+        hab("invasor_digital", "Invasor Digital", "Realiza ataques virtuais."),
+        hab("engenheiro_improvisado", "Engenheiro Improvisado", "Conserta tecnologia com poucos recursos."),
+        hab("mente_computacional", "Mente Computacional", "Processa informações rapidamente."),
+        hab("especialista_em_sistemas", "Especialista em Sistemas", "Entende redes complexas."),
+        hab("criptografo", "Criptógrafo", "Quebra códigos e proteções."),
+        hab("fantasma_digital", "Fantasma Digital", "Dificulta rastreamento."),
+        hab("mecatronico", "Mecatrônico", "Modifica máquinas e implantes."),
+        hab("arquiteto_de_rede", "Arquiteto de Rede", "Cria sistemas próprios."),
+        hab("controlador_remoto", "Controlador Remoto", "Manipula equipamentos à distância."),
+        hab("cacador_de_dados", "Caçador de Dados", "Encontra informações escondidas."),
+        hab("ia_parceira", "IA Parceira", "Trabalha com inteligências artificiais."),
+        hab("contra_hacker", "Contra-Hacker", "Defende sistemas."),
+        hab("mestre_dos_implantes", "Mestre dos Implantes", "Instala e modifica cibernética."),
+        hab("consciencia_digital", "Consciência Digital", "Integra tecnologia e mente.")
     ]
 };
+
+// ===== MAESTRIAS DE ARMAS =====
+// Cada arma evolui de nível conforme o uso ao longo da história (ajuste manual +/-).
+const maestriasGrupos = [
+    {
+        id: "brancas",
+        nome: "Armas Brancas",
+        icone: "fa-khanda",
+        armas: [
+            { key: "facas", nome: "Facas", icone: "fa-utensils" },
+            { key: "arremessaveis", nome: "Arremessáveis", icone: "fa-bullseye" },
+            { key: "espadas", nome: "Espadas", icone: "fa-khanda" },
+            { key: "contundentes", nome: "Contundentes", icone: "fa-hammer" }
+        ]
+    },
+    {
+        id: "fogo",
+        nome: "Armas de Fogo",
+        icone: "fa-gun",
+        armas: [
+            { key: "pistolas", nome: "Pistolas", icone: "fa-gun" },
+            { key: "escopetas", nome: "Escopetas", icone: "fa-gun" },
+            { key: "fuzis", nome: "Fuzis", icone: "fa-gun" },
+            { key: "metralhadoras", nome: "Metralhadoras", icone: "fa-gun" },
+            { key: "submetralhadoras", nome: "Sub-metralhadoras", icone: "fa-gun" },
+            { key: "snipers", nome: "Snipers", icone: "fa-crosshairs" },
+            { key: "pesadas", nome: "Pesadas", icone: "fa-bomb" }
+        ]
+    }
+];
+
+// Nível máximo de uma maestria (pips exibidos)
+const MAESTRIA_MAX = 10;
+
+// Retorna um objeto de maestrias zerado (todas as armas em nível 0)
+function maestriasPadrao() {
+    const obj = {};
+    maestriasGrupos.forEach(g => g.armas.forEach(a => { obj[a.key] = 0; }));
+    return obj;
+}
+
+// Retorna a estrutura de implantes do corpo vazia
+function implantesCorpoPadrao() {
+    return { cabeca: [], torax: [], bracos: [], maos: [], pernas: [] };
+}
+
+// Regiões do corpo (ordem/rótulos)
+const regioesCorpo = [
+    { key: "cabeca", nome: "Cabeça" },
+    { key: "torax", nome: "Tórax" },
+    { key: "bracos", nome: "Braços" },
+    { key: "maos", nome: "Mãos" },
+    { key: "pernas", nome: "Pernas" }
+];
+
+// ===== ATRIBUTOS (6 árvores) =====
+// Fonte única da verdade para nome/chave/ícone/descrição de cada atributo.
+function listaAtributosBase() {
+    return [
+        { nome: "Carne", key: "carne", icone: "fa-fist-raised", desc: "O corpo como arma. Resistência, força, sobrevivência e adaptação física. Define Vida e Energia." },
+        { nome: "Intuição", key: "intuicao", icone: "fa-eye", desc: "Instinto, percepção e capacidade de entender o mundo antes dos outros." },
+        { nome: "Foco", key: "foco", icone: "fa-crosshairs", desc: "Precisão, disciplina, combate e controle técnico." },
+        { nome: "Manha", key: "manha", icone: "fa-user-ninja", desc: "Crime, sobrevivência urbana, improviso e malandragem." },
+        { nome: "Proza", key: "proza", icone: "fa-comments", desc: "Palavras, influência, manipulação e relações humanas." },
+        { nome: "Rede", key: "rede", icone: "fa-network-wired", desc: "Tecnologia, informação, hackers e máquinas." }
+    ];
+}
+
+// ===== COR / TEMA DA FICHA (personalizável por jogador) =====
+const COR_PADRAO = "#ff2e97"; // magenta (accent primário padrão; ciano fica como secundário fixo)
+
+// Temas prontos (cada um é a cor-accent que comanda todo o neon da ficha)
+const temasFicha = [
+    { nome: "Ciano", cor: "#00e0ff" },
+    { nome: "Magenta", cor: "#ff2e97" },
+    { nome: "Verde", cor: "#00ff9d" },
+    { nome: "Âmbar", cor: "#f2b33d" },
+    { nome: "Vermelho", cor: "#ff5470" },
+    { nome: "Roxo", cor: "#b56bff" },
+    { nome: "Laranja", cor: "#ff8a3d" },
+    { nome: "Branco", cor: "#e6f3ff" }
+];
+
+// Converte "#rrggbb" em "r, g, b" (para usar em rgba())
+function hexParaRgb(hex) {
+    let h = String(hex || COR_PADRAO).replace('#', '').trim();
+    if (h.length === 3) h = h.split('').map(c => c + c).join('');
+    const n = parseInt(h, 16);
+    if (isNaN(n)) return '0, 224, 255';
+    return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`;
+}
+
+// Aplica a cor-accent do personagem: recolore todo o neon (ícones, bordas, brilhos, barras, glitch)
+function aplicarCorFicha(cor) {
+    const c = cor || COR_PADRAO;
+    const rgb = hexParaRgb(c);
+    const root = document.documentElement;
+    root.style.setProperty('--cor-destaque-ciano', c);
+    root.style.setProperty('--cor-destaque-azul', c); // elimina o azul legado: segue o tema
+    root.style.setProperty('--accent', c);
+    root.style.setProperty('--accent-rgb', rgb);
+}
 
 // ===== ESTADO DO PERSONAGEM =====
 let personagem = {
@@ -198,14 +309,16 @@ let personagem = {
     periciasExtrasDisponiveis: 0,
     atributos: {
         carne: 1,
-        malandragem: 1,
+        intuicao: 1,
         foco: 1,
-        recurso: 1,
-        labia: 1
+        manha: 1,
+        proza: 1,
+        rede: 1
     },
     periciasEscolhidas: [],
     habilidadesAdquiridas: [],
-    pontosAtributos: 6,
+    pontosAtributos: 7,
+    maestrias: maestriasPadrao(),
     detalhes: {
         idade: 25,
         altura: 175,
@@ -213,9 +326,12 @@ let personagem = {
         historia: ""
     },
     hacks: "",
-    inventario: "Colete leve\nComunicador\nKit básico de ferramentas",
+    inventario: "",
     itensPersonalizados: [],
     implantes: "",
+    implantesCorpo: implantesCorpoPadrao(),
+    cor: COR_PADRAO,
+    foto: "",
     medidores: {
         ferimentos: Array(6).fill(false),
         estresse: Array(6).fill(false),
@@ -243,6 +359,14 @@ let atributoSelecionado = null;
 let itemParaRemover = null;
 let fichaSelecionadaId = null;
 let itensPersonalizados = [];
+let regiaoCorpoSelecionada = null;
+
+// ===== NUVEM (Firebase) =====
+let db = null;                 // instância do Firestore
+let cloudAtivo = false;        // true quando o Firebase está configurado e iniciado
+let mesaCodigo = '';           // código da mesa (compartilhado entre jogadores e mestre)
+let unsubscribeNuvem = null;   // cancela o listener em tempo real
+let cloudPushTimer = null;     // debounce do envio automático
 
 // ===== FUNÇÕES DE CONTROLE DE TELAS =====
 function mostrarTela(idTela) {
@@ -265,10 +389,14 @@ function mostrarTela(idTela) {
         // Atualiza contador de fichas na intro
         if (idTela === 'tela-intro') {
             atualizarContadorFichas();
+            // Se o boot já rodou, mostra o menu direto ao voltar pra intro
+            const menuIntro = document.getElementById('intro-menu');
+            if (menuIntro && introBootRodou) menuIntro.classList.add('revelado');
         }
         
         // Atualiza ficha se for a tela da ficha
         if (idTela === 'tela-ficha') {
+            rodarBoot();
             atualizarFicha();
             atualizarUltimaAtualizacao();
         }
@@ -314,7 +442,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Inicializa quadradinhos e habilidades
     inicializarQuadradinhos();
     inicializarHabilidades();
-    
+    inicializarArvoreModal();
+    inicializarMaestrias();
+    inicializarCorpoImplantes();
+    inicializarNuvem();
+    inicializarPersonalizacao();
+    runIntroBoot();
+
     console.log("Sistema inicializado com sucesso!");
 });
 
@@ -360,13 +494,7 @@ function inicializarDados() {
     const listaAtributos = document.getElementById('lista-atributos');
     if (listaAtributos) {
         listaAtributos.innerHTML = '';
-        const atributos = [
-            { nome: "Carne", key: "carne", icone: "fa-fist-raised", desc: "Força física, resistência, saúde. Define Vida e Energia." },
-            { nome: "Malandragem", key: "malandragem", icone: "fa-user-ninja", desc: "Agilidade, furtividade, destreza manual." },
-            { nome: "Foco", key: "foco", icone: "fa-eye", desc: "Percepção, atenção, precisão." },
-            { nome: "Recurso", key: "recurso", icone: "fa-brain", desc: "Conhecimento, lógica, memória, habilidades técnicas." },
-            { nome: "Lábia", key: "labia", icone: "fa-comments", desc: "Persuasão, manipulação, carisma, influência social." }
-        ];
+        const atributos = listaAtributosBase();
         
         atributos.forEach(atrib => {
             const div = document.createElement('div');
@@ -448,57 +576,67 @@ function inicializarQuadradinhos() {
     });
 }
 
-function toggleQuadradinho(medidor, index, elemento) {
-    // Alterna estado do quadradinho
-    personagem.medidores[medidor][index] = !personagem.medidores[medidor][index];
-    
-    if (personagem.medidores[medidor][index]) {
-        elemento.classList.add('preenchido');
-        if (medidor === 'ferimentos') {
-            elemento.classList.add('dano');
-        }
-    } else {
-        elemento.classList.remove('preenchido');
-        if (medidor === 'ferimentos') {
-            elemento.classList.remove('dano');
-        }
+function toggleQuadradinho(medidor, index) {
+    // Preenchimento cumulativo (tipo barra): clicar no quadrado i preenche do 1º até o i.
+    const arr = personagem.medidores[medidor];
+    if (!arr) return;
+
+    // Descobre o maior quadrado atualmente preenchido
+    let maxPreenchido = -1;
+    arr.forEach((v, i) => { if (v) maxPreenchido = i; });
+
+    // Se clicar exatamente no último preenchido, desmarca ele (nível cai 1).
+    // Caso contrário, preenche até o quadrado clicado.
+    const novoNivel = (arr[index] && index === maxPreenchido) ? index : index + 1;
+
+    for (let k = 0; k < arr.length; k++) {
+        arr[k] = k < novoNivel;
     }
-    
+
+    // Re-renderiza os quadradinhos deste medidor
+    atualizarQuadradinhos();
+
     // Salva automaticamente
     salvarAutomaticamente();
 }
 
-function inicializarHabilidades() {
-    const tabsContainer = document.getElementById('habilidades-tabs');
-    const conteudoContainer = document.getElementById('habilidades-conteudo');
-    
+// Constrói uma árvore de habilidades (abas + conteúdo) dentro dos containers dados.
+// prefixo garante IDs únicos entre a versão embutida no card e a versão do modal.
+function construirArvore(tabsContainer, conteudoContainer, prefixo) {
     if (!tabsContainer || !conteudoContainer) return;
-    
-    // Cria tabs
-    const atributos = ['carne', 'malandragem', 'foco', 'labia', 'recurso'];
-    const nomes = { carne: 'Carne', malandragem: 'Malandragem', foco: 'Foco', labia: 'Lábia', recurso: 'Recurso' };
-    
-    atributos.forEach((atrib, index) => {
-        // Tab
+
+    tabsContainer.innerHTML = '';
+    conteudoContainer.innerHTML = '';
+
+    const baseAtributos = listaAtributosBase();
+
+    baseAtributos.forEach((info, index) => {
+        const atrib = info.key;
+
+        // Aba
         const tab = document.createElement('div');
         tab.className = `habilidade-tab ${index === 0 ? 'ativa' : ''}`;
         tab.setAttribute('data-atributo', atrib);
-        tab.innerHTML = `<i class="fas fa-${atrib === 'carne' ? 'fist-raised' : atrib === 'malandragem' ? 'user-ninja' : atrib === 'foco' ? 'eye' : atrib === 'labia' ? 'comments' : 'brain'}"></i> ${nomes[atrib]}`;
-        tab.addEventListener('click', () => mostrarHabilidadeCategoria(atrib));
+        tab.setAttribute('data-arvore', prefixo);
+        tab.innerHTML = `<i class="fas ${info.icone}"></i> ${info.nome}`;
+        tab.addEventListener('click', () => ativarCategoriaArvore(prefixo, atrib));
         tabsContainer.appendChild(tab);
-        
-        // Conteúdo da categoria
+
+        // Conteúdo
         const categoria = document.createElement('div');
         categoria.className = `habilidade-categoria ${index === 0 ? 'ativa' : ''}`;
-        categoria.id = `habilidades-${atrib}`;
-        
+        categoria.setAttribute('data-arvore', prefixo);
+        categoria.setAttribute('data-atributo', atrib);
+        categoria.id = `${prefixo}-${atrib}`;
+
         habilidadesArvore[atrib].forEach(habilidade => {
+            const adquirida = personagem.habilidadesAdquiridas.some(h => h.id === habilidade.id && h.atributo === atrib);
             const div = document.createElement('div');
-            div.className = 'habilidade-item';
+            div.className = `habilidade-item ${adquirida ? 'adquirida' : ''}`;
             div.setAttribute('data-id', habilidade.id);
             div.setAttribute('data-atributo', atrib);
             div.setAttribute('data-cor', habilidade.cor);
-            
+
             div.innerHTML = `
                 <div class="habilidade-header">
                     <div class="habilidade-nome">
@@ -510,61 +648,383 @@ function inicializarHabilidades() {
                 <div class="habilidade-desc">${habilidade.descricao}</div>
                 <div class="habilidade-check"><i class="fas fa-check"></i></div>
             `;
-            
+
             div.addEventListener('click', () => toggleHabilidade(habilidade.id, atrib, div));
             categoria.appendChild(div);
         });
-        
+
         conteudoContainer.appendChild(categoria);
     });
 }
 
-function mostrarHabilidadeCategoria(atributo) {
-    // Ativa a tab
-    document.querySelectorAll('.habilidade-tab').forEach(tab => {
-        tab.classList.remove('ativa');
+// Ativa a aba/categoria de uma árvore específica (embutida ou modal), sem afetar a outra.
+function ativarCategoriaArvore(prefixo, atributo) {
+    document.querySelectorAll(`.habilidade-tab[data-arvore="${prefixo}"]`).forEach(t => {
+        t.classList.toggle('ativa', t.getAttribute('data-atributo') === atributo);
     });
-    const tabAtiva = document.querySelector(`.habilidade-tab[data-atributo="${atributo}"]`);
-    if (tabAtiva) tabAtiva.classList.add('ativa');
-    
-    // Mostra o conteúdo
-    document.querySelectorAll('.habilidade-categoria').forEach(cat => {
-        cat.classList.remove('ativa');
+    document.querySelectorAll(`.habilidade-categoria[data-arvore="${prefixo}"]`).forEach(c => {
+        c.classList.toggle('ativa', c.getAttribute('data-atributo') === atributo);
     });
-    const categoriaAtiva = document.getElementById(`habilidades-${atributo}`);
-    if (categoriaAtiva) categoriaAtiva.classList.add('ativa');
+}
+
+// Sincroniza o estado "adquirida" de todos os itens (card + modal) com o personagem.
+function sincronizarArvores() {
+    document.querySelectorAll('.habilidade-item').forEach(el => {
+        const id = el.getAttribute('data-id');
+        const at = el.getAttribute('data-atributo');
+        const adq = personagem.habilidadesAdquiridas.some(h => h.id === id && h.atributo === at);
+        el.classList.toggle('adquirida', adq);
+    });
+}
+
+function inicializarHabilidades() {
+    construirArvore(
+        document.getElementById('habilidades-tabs'),
+        document.getElementById('habilidades-conteudo'),
+        'habilidades'
+    );
+}
+
+function inicializarArvoreModal() {
+    construirArvore(
+        document.getElementById('habilidades-tabs-modal'),
+        document.getElementById('habilidades-conteudo-modal'),
+        'arvoremodal'
+    );
+
+    const btnExpandir = document.getElementById('btn-expandir-arvore');
+    if (btnExpandir) btnExpandir.addEventListener('click', abrirModalArvore);
+}
+
+function abrirModalArvore() {
+    const modal = document.getElementById('modal-arvore');
+    if (!modal) return;
+    sincronizarArvores();
+    const pontosEl = document.getElementById('arvore-modal-pontos');
+    if (pontosEl) pontosEl.textContent = personagem.pontosAtributoDisponiveis;
+    modal.classList.add('active');
+}
+
+// ===== MAESTRIAS DE ARMAS =====
+function inicializarMaestrias() {
+    const tabsContainer = document.getElementById('maestria-tabs');
+    const conteudoContainer = document.getElementById('maestria-conteudo');
+    if (!tabsContainer || !conteudoContainer) return;
+
+    tabsContainer.innerHTML = '';
+    conteudoContainer.innerHTML = '';
+
+    maestriasGrupos.forEach((grupo, index) => {
+        // Aba do grupo
+        const tab = document.createElement('div');
+        tab.className = `maestria-tab ${index === 0 ? 'ativa' : ''}`;
+        tab.setAttribute('data-grupo', grupo.id);
+        tab.innerHTML = `<i class="fas ${grupo.icone}"></i> ${grupo.nome}`;
+        tab.addEventListener('click', () => mostrarMaestriaGrupo(grupo.id));
+        tabsContainer.appendChild(tab);
+
+        // Conteúdo do grupo
+        const categoria = document.createElement('div');
+        categoria.className = `maestria-categoria ${index === 0 ? 'ativa' : ''}`;
+        categoria.id = `maestrias-${grupo.id}`;
+
+        grupo.armas.forEach(arma => {
+            const item = document.createElement('div');
+            item.className = 'maestria-item';
+            item.innerHTML = `
+                <div class="maestria-info">
+                    <i class="fas ${arma.icone}"></i>
+                    <span class="maestria-nome">${arma.nome}</span>
+                </div>
+                <div class="maestria-controle">
+                    <div class="maestria-pips" id="maestria-pips-${arma.key}"></div>
+                    <div class="maestria-nivel-box">
+                        <button class="maestria-btn" data-mkey="${arma.key}" data-delta="-1" aria-label="Diminuir"><i class="fas fa-minus"></i></button>
+                        <span class="maestria-nivel" id="maestria-nivel-${arma.key}">0</span>
+                        <button class="maestria-btn" data-mkey="${arma.key}" data-delta="1" aria-label="Aumentar"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            `;
+            categoria.appendChild(item);
+        });
+
+        conteudoContainer.appendChild(categoria);
+    });
+
+    // Delegação dos botões +/- (o container é fixo)
+    conteudoContainer.addEventListener('click', function(e) {
+        const btn = e.target.closest('.maestria-btn');
+        if (!btn) return;
+        const mkey = btn.getAttribute('data-mkey');
+        const delta = parseInt(btn.getAttribute('data-delta'), 10);
+        alterarMaestria(mkey, delta);
+    });
+}
+
+function mostrarMaestriaGrupo(grupoId) {
+    document.querySelectorAll('.maestria-tab').forEach(t => t.classList.remove('ativa'));
+    const tab = document.querySelector(`.maestria-tab[data-grupo="${grupoId}"]`);
+    if (tab) tab.classList.add('ativa');
+
+    document.querySelectorAll('.maestria-categoria').forEach(c => c.classList.remove('ativa'));
+    const cat = document.getElementById(`maestrias-${grupoId}`);
+    if (cat) cat.classList.add('ativa');
+}
+
+function alterarMaestria(mkey, delta) {
+    if (!personagem.maestrias) personagem.maestrias = maestriasPadrao();
+    let valor = personagem.maestrias[mkey] || 0;
+    valor = Math.max(0, Math.min(MAESTRIA_MAX, valor + delta));
+    personagem.maestrias[mkey] = valor;
+    atualizarMaestriaItem(mkey);
+    salvarAutomaticamente();
+}
+
+function atualizarMaestriaItem(mkey) {
+    const nivel = (personagem.maestrias && personagem.maestrias[mkey]) || 0;
+
+    const nivelEl = document.getElementById(`maestria-nivel-${mkey}`);
+    if (nivelEl) nivelEl.textContent = nivel;
+
+    const pipsEl = document.getElementById(`maestria-pips-${mkey}`);
+    if (pipsEl) {
+        pipsEl.innerHTML = '';
+        for (let i = 1; i <= MAESTRIA_MAX; i++) {
+            const pip = document.createElement('span');
+            pip.className = `maestria-pip ${i <= nivel ? 'ativo' : ''}`;
+            pipsEl.appendChild(pip);
+        }
+    }
+}
+
+function renderMaestrias() {
+    if (!personagem.maestrias) personagem.maestrias = maestriasPadrao();
+    maestriasGrupos.forEach(g => g.armas.forEach(a => atualizarMaestriaItem(a.key)));
+}
+
+// ===== CORPO / IMPLANTES =====
+function escaparHTML(str) {
+    return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function nomeRegiao(regiao) {
+    const r = regioesCorpo.find(x => x.key === regiao);
+    return r ? r.nome : regiao;
+}
+
+function inicializarCorpoImplantes() {
+    // Cliques nas regiões do boneco (SVG)
+    const svg = document.getElementById('corpo-svg');
+    if (svg) {
+        svg.querySelectorAll('.corpo-regiao').forEach(regiaoEl => {
+            regiaoEl.addEventListener('click', () => {
+                selecionarRegiaoCorpo(regiaoEl.getAttribute('data-regiao'));
+            });
+        });
+    }
+
+    // Legenda de regiões (com contagem), também clicável
+    const legenda = document.getElementById('corpo-legenda');
+    if (legenda) {
+        legenda.innerHTML = '';
+        regioesCorpo.forEach(r => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'corpo-legenda-item';
+            btn.setAttribute('data-regiao', r.key);
+            btn.innerHTML = `${r.nome} <span class="corpo-badge" id="corpo-badge-${r.key}">0</span>`;
+            btn.addEventListener('click', () => selecionarRegiaoCorpo(r.key));
+            legenda.appendChild(btn);
+        });
+    }
+
+    // Confirmar implante (modal — botão fixo)
+    const btnConfirmar = document.getElementById('btn-confirmar-implante');
+    if (btnConfirmar) btnConfirmar.addEventListener('click', confirmarImplante);
+
+    // Remoção de implante (delegação — o painel é fixo)
+    const painel = document.getElementById('corpo-painel');
+    if (painel) {
+        painel.addEventListener('click', function(e) {
+            const btnAdd = e.target.closest('#btn-add-implante');
+            if (btnAdd) { abrirModalImplante(); return; }
+            const btnRem = e.target.closest('.btn-remover-implante');
+            if (btnRem) {
+                const idx = parseInt(btnRem.getAttribute('data-index'), 10);
+                removerImplante(regiaoCorpoSelecionada, idx);
+            }
+        });
+    }
+}
+
+function selecionarRegiaoCorpo(regiao) {
+    regiaoCorpoSelecionada = regiao;
+
+    // Destaca a região no boneco
+    document.querySelectorAll('#corpo-svg .corpo-regiao').forEach(el => {
+        el.classList.toggle('selecionada', el.getAttribute('data-regiao') === regiao);
+    });
+
+    // Destaca na legenda
+    document.querySelectorAll('.corpo-legenda-item').forEach(el => {
+        el.classList.toggle('ativo', el.getAttribute('data-regiao') === regiao);
+    });
+
+    renderPainelCorpo();
+}
+
+function renderPainelCorpo() {
+    const painel = document.getElementById('corpo-painel');
+    if (!painel) return;
+
+    if (!personagem.implantesCorpo) personagem.implantesCorpo = implantesCorpoPadrao();
+
+    if (!regiaoCorpoSelecionada) {
+        painel.innerHTML = '<div class="corpo-painel-vazio"><i class="fas fa-hand-pointer"></i> Clique em uma parte do corpo para ver e adicionar implantes.</div>';
+        return;
+    }
+
+    const lista = personagem.implantesCorpo[regiaoCorpoSelecionada] || [];
+    let html = `
+        <div class="corpo-painel-header">
+            <h4><i class="fas fa-microchip"></i> ${escaparHTML(nomeRegiao(regiaoCorpoSelecionada))}</h4>
+            <button class="btn-add-implante" id="btn-add-implante" title="Adicionar implante" aria-label="Adicionar implante"><i class="fas fa-plus"></i></button>
+        </div>
+    `;
+
+    if (lista.length === 0) {
+        html += '<div class="implantes-vazio">Nenhum implante nesta região ainda.</div>';
+    } else {
+        html += '<div class="implantes-lista">';
+        lista.forEach((imp, idx) => {
+            html += `
+                <div class="implante-chip">
+                    <button class="btn-remover-implante" data-index="${idx}" title="Remover"><i class="fas fa-times"></i></button>
+                    <div class="implante-nome"><i class="fas fa-microchip"></i> ${escaparHTML(imp.nome)}</div>
+                    ${imp.descricao ? `<div class="implante-desc">${escaparHTML(imp.descricao)}</div>` : ''}
+                </div>
+            `;
+        });
+        html += '</div>';
+    }
+
+    painel.innerHTML = html;
+}
+
+function abrirModalImplante() {
+    if (!regiaoCorpoSelecionada) {
+        alert('Selecione uma parte do corpo primeiro!');
+        return;
+    }
+    const modal = document.getElementById('modal-implante');
+    if (!modal) return;
+
+    const regiaoLabel = document.getElementById('modal-implante-regiao');
+    if (regiaoLabel) regiaoLabel.textContent = nomeRegiao(regiaoCorpoSelecionada);
+
+    const nomeInput = document.getElementById('input-implante-nome');
+    const descInput = document.getElementById('input-implante-desc');
+    if (nomeInput) nomeInput.value = '';
+    if (descInput) descInput.value = '';
+
+    modal.classList.add('active');
+    if (nomeInput) setTimeout(() => nomeInput.focus(), 50);
+}
+
+function confirmarImplante() {
+    if (!regiaoCorpoSelecionada) return;
+
+    const nomeInput = document.getElementById('input-implante-nome');
+    const descInput = document.getElementById('input-implante-desc');
+    const nome = (nomeInput ? nomeInput.value : '').trim();
+    const descricao = (descInput ? descInput.value : '').trim();
+
+    if (!nome) {
+        alert('Dê um nome ao implante!');
+        return;
+    }
+
+    if (!personagem.implantesCorpo) personagem.implantesCorpo = implantesCorpoPadrao();
+    if (!personagem.implantesCorpo[regiaoCorpoSelecionada]) personagem.implantesCorpo[regiaoCorpoSelecionada] = [];
+    personagem.implantesCorpo[regiaoCorpoSelecionada].push({ nome, descricao });
+
+    const modal = document.getElementById('modal-implante');
+    if (modal) modal.classList.remove('active');
+
+    renderPainelCorpo();
+    atualizarBadgesCorpo();
+    salvarAutomaticamente();
+}
+
+function removerImplante(regiao, index) {
+    if (!regiao || !personagem.implantesCorpo || !personagem.implantesCorpo[regiao]) return;
+    const imp = personagem.implantesCorpo[regiao][index];
+    if (!imp) return;
+
+    if (confirm(`Remover implante "${imp.nome}"?`)) {
+        personagem.implantesCorpo[regiao].splice(index, 1);
+        renderPainelCorpo();
+        atualizarBadgesCorpo();
+        salvarAutomaticamente();
+    }
+}
+
+function atualizarBadgesCorpo() {
+    if (!personagem.implantesCorpo) personagem.implantesCorpo = implantesCorpoPadrao();
+    regioesCorpo.forEach(r => {
+        const count = (personagem.implantesCorpo[r.key] || []).length;
+
+        const badge = document.getElementById(`corpo-badge-${r.key}`);
+        if (badge) {
+            badge.textContent = count;
+            badge.classList.toggle('vazio', count === 0);
+        }
+
+        document.querySelectorAll(`#corpo-svg .corpo-regiao[data-regiao="${r.key}"]`).forEach(el => {
+            el.classList.toggle('tem-implante', count > 0);
+        });
+    });
+}
+
+function renderCorpoImplantes() {
+    atualizarBadgesCorpo();
+    renderPainelCorpo();
 }
 
 function toggleHabilidade(idHabilidade, atributo, elemento) {
     const index = personagem.habilidadesAdquiridas.findIndex(h => h.id === idHabilidade && h.atributo === atributo);
-    
+
     if (index === -1) {
         // Verifica se tem pontos de habilidade disponíveis
         if (personagem.pontosAtributoDisponiveis > 0) {
             const habilidade = habilidadesArvore[atributo].find(h => h.id === idHabilidade);
-            personagem.habilidadesAdquiridas.push({ 
-                id: idHabilidade, 
+            personagem.habilidadesAdquiridas.push({
+                id: idHabilidade,
                 atributo: atributo,
                 nome: habilidade.nome,
                 descricao: habilidade.descricao,
                 cor: habilidade.cor
             });
-            elemento.classList.add('adquirida');
             personagem.pontosAtributoDisponiveis--;
-            atualizarFicha();
-            atualizarHabilidadesResumo();
-            salvarAutomaticamente();
         } else {
             alert("Você não tem pontos de habilidade disponíveis!");
+            return;
         }
     } else {
         personagem.habilidadesAdquiridas.splice(index, 1);
-        elemento.classList.remove('adquirida');
         personagem.pontosAtributoDisponiveis++;
-        atualizarFicha();
-        atualizarHabilidadesResumo();
-        salvarAutomaticamente();
     }
+
+    // Sincroniza card + modal, atualiza contadores e salva
+    sincronizarArvores();
+    atualizarFicha();
+    atualizarHabilidadesResumo();
+    salvarAutomaticamente();
 }
 
 function atualizarHabilidadesResumo() {
@@ -914,11 +1374,73 @@ function configurarEventos() {
     if (btnAdicionarItem) {
         btnAdicionarItem.addEventListener('click', adicionarItemInventario);
     }
-    
-    const btnRemoverItem = document.getElementById('btn-remover-item');
-    if (btnRemoverItem) {
-        btnRemoverItem.addEventListener('click', mostrarModalRemoverItem);
+
+    // Remoção inline de itens (delegação — o container é fixo)
+    const inventarioContainer = document.getElementById('inventario-personalizado');
+    if (inventarioContainer) {
+        inventarioContainer.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn-remover-item-inline');
+            if (!btn) return;
+            const idx = parseInt(btn.getAttribute('data-index'), 10);
+            removerItemInventario(idx);
+        });
     }
+
+    // ===== EVENTOS DA NUVEM =====
+    const btnNuvem = document.getElementById('btn-nuvem');
+    if (btnNuvem) btnNuvem.addEventListener('click', abrirModalNuvem);
+
+    const btnSalvarMesa = document.getElementById('btn-salvar-mesa');
+    if (btnSalvarMesa) btnSalvarMesa.addEventListener('click', definirMesa);
+
+    const inputMesa = document.getElementById('input-mesa');
+    if (inputMesa) {
+        inputMesa.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') definirMesa();
+        });
+    }
+
+    const btnNuvemSalvar = document.getElementById('btn-nuvem-salvar');
+    if (btnNuvemSalvar) btnNuvemSalvar.addEventListener('click', () => salvarFichaNuvem(false));
+
+    const btnNuvemEnviarLocais = document.getElementById('btn-nuvem-enviar-locais');
+    if (btnNuvemEnviarLocais) btnNuvemEnviarLocais.addEventListener('click', enviarLocaisParaNuvem);
+
+    // Abrir ficha da lista da nuvem (delegação)
+    const nuvemLista = document.getElementById('nuvem-lista');
+    if (nuvemLista) {
+        nuvemLista.addEventListener('click', function(e) {
+            const btn = e.target.closest('.nuvem-abrir');
+            if (!btn) return;
+            abrirFichaNuvem(btn.getAttribute('data-id'));
+        });
+    }
+
+    // ===== EVENTOS DE PERSONALIZAÇÃO (COR + FOTO) =====
+    const btnPersonalizar = document.getElementById('btn-personalizar');
+    if (btnPersonalizar) btnPersonalizar.addEventListener('click', abrirModalPersonalizar);
+
+    const corPicker = document.getElementById('cor-picker');
+    if (corPicker) corPicker.addEventListener('input', function() { definirCorFicha(this.value); });
+
+    const inputFoto = document.getElementById('input-foto');
+    if (inputFoto) inputFoto.addEventListener('change', aoSelecionarFoto);
+
+    const btnEscolherFoto = document.getElementById('btn-escolher-foto');
+    if (btnEscolherFoto && inputFoto) btnEscolherFoto.addEventListener('click', () => inputFoto.click());
+
+    const fotoPreview = document.getElementById('foto-preview');
+    if (fotoPreview && inputFoto) fotoPreview.addEventListener('click', () => inputFoto.click());
+
+    const btnRemoverFoto = document.getElementById('btn-remover-foto');
+    if (btnRemoverFoto) btnRemoverFoto.addEventListener('click', removerFoto);
+
+    // Cartão de ID: nome editável e clique na foto abre o seletor
+    const idcardNome = document.getElementById('idcard-nome');
+    if (idcardNome) idcardNome.addEventListener('input', aoEditarNomeIdCard);
+
+    const idcardFoto = document.getElementById('idcard-foto');
+    if (idcardFoto && inputFoto) idcardFoto.addEventListener('click', () => inputFoto.click());
     
     // ===== EVENTOS DOS MODAIS =====
     
@@ -1345,14 +1867,25 @@ function gerarFicha() {
 
 function atualizarFicha() {
     console.log("Atualizando ficha...");
-    
-    // Identificação
-    document.getElementById('ficha-nome').textContent = personagem.nome || "---";
-    document.getElementById('ficha-classe').textContent = personagem.classe ? personagem.classe.nome : "---";
-    document.getElementById('ficha-origem').textContent = personagem.origem || "---";
-    document.getElementById('ficha-nivel').textContent = personagem.nivel;
-    document.getElementById('ficha-xp').textContent = personagem.xp;
-    
+
+    // Aplica a cor personalizada da ficha (recolore todo o neon)
+    aplicarCorFicha(personagem.cor);
+
+    // Identificação (guardado: os campos podem não existir se o layout mudou)
+    const elNome = document.getElementById('ficha-nome');
+    if (elNome) elNome.textContent = personagem.nome || "---";
+    const elClasse = document.getElementById('ficha-classe');
+    if (elClasse) elClasse.textContent = personagem.classe ? personagem.classe.nome : "---";
+    const elOrigem = document.getElementById('ficha-origem');
+    if (elOrigem) elOrigem.textContent = personagem.origem || "---";
+    const elNivel = document.getElementById('ficha-nivel');
+    if (elNivel) elNivel.textContent = personagem.nivel;
+    const elXp = document.getElementById('ficha-xp');
+    if (elXp) elXp.textContent = personagem.xp;
+
+    // Cartão de ID (topo)
+    renderIdCard();
+
     // Data e ID
     const data = personagem.dataCriacao ? new Date(personagem.dataCriacao) : new Date();
     document.getElementById('ficha-data').textContent = data.toLocaleDateString('pt-BR');
@@ -1397,15 +1930,9 @@ function atualizarFicha() {
     const atributosContainer = document.getElementById('atributos-ficha');
     if (atributosContainer) {
         atributosContainer.innerHTML = '';
-        
-        const atributos = [
-            { nome: "Carne", key: "carne", icone: "fa-fist-raised" },
-            { nome: "Malandragem", key: "malandragem", icone: "fa-user-ninja" },
-            { nome: "Foco", key: "foco", icone: "fa-eye" },
-            { nome: "Recurso", key: "recurso", icone: "fa-brain" },
-            { nome: "Lábia", key: "labia", icone: "fa-comments" }
-        ];
-        
+
+        const atributos = listaAtributosBase();
+
         atributos.forEach(atrib => {
             const div = document.createElement('div');
             const disponivel = personagem.pontosAtributoDisponiveis > 0 && personagem.atributos[atrib.key] < 5;
@@ -1478,7 +2005,18 @@ function atualizarFicha() {
     
     // Atualiza habilidades resumo
     atualizarHabilidadesResumo();
-    
+
+    // Sincroniza estado das árvores (card + modal) e o contador do modal
+    sincronizarArvores();
+    const arvoreModalPontos = document.getElementById('arvore-modal-pontos');
+    if (arvoreModalPontos) arvoreModalPontos.textContent = personagem.pontosAtributoDisponiveis;
+
+    // Atualiza maestrias de armas
+    renderMaestrias();
+
+    // Atualiza corpo / implantes
+    renderCorpoImplantes();
+
     // Atualiza quadradinhos
     atualizarQuadradinhos();
     
@@ -1515,33 +2053,35 @@ function atualizarQuadradinhos() {
 function atualizarInventarioPersonalizado() {
     const container = document.getElementById('inventario-personalizado');
     if (!container) return;
-    
+
     container.innerHTML = '';
-    
+
     if (itensPersonalizados.length === 0) {
+        container.innerHTML = '<div class="inventario-vazio">Nenhum item no inventário ainda.</div>';
         return;
     }
-    
+
     itensPersonalizados.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = 'inventario-item personalizado';
         div.setAttribute('data-index', index);
-        div.innerHTML = `<i class="fas fa-box"></i> ${item}`;
-        
-        // Adiciona evento para remover
-        div.addEventListener('click', function(e) {
-            if (e.ctrlKey) { // Ctrl+clique para remover
-                if (confirm(`Remover item "${item}"?`)) {
-                    itensPersonalizados.splice(index, 1);
-                    personagem.itensPersonalizados = itensPersonalizados;
-                    atualizarInventarioPersonalizado();
-                    salvarAutomaticamente();
-                }
-            }
-        });
-        
+        div.innerHTML = `
+            <span class="inventario-item-nome"><i class="fas fa-box"></i> ${escaparHTML(item)}</span>
+            <button class="btn-remover-item-inline" data-index="${index}" title="Remover item" aria-label="Remover item"><i class="fas fa-times"></i></button>
+        `;
         container.appendChild(div);
     });
+}
+
+function removerItemInventario(index) {
+    const item = itensPersonalizados[index];
+    if (item === undefined) return;
+    if (confirm(`Remover item "${item}"?`)) {
+        itensPersonalizados.splice(index, 1);
+        personagem.itensPersonalizados = itensPersonalizados;
+        atualizarInventarioPersonalizado();
+        salvarAutomaticamente();
+    }
 }
 
 function atualizarListaFichasSalvas() {
@@ -1614,7 +2154,10 @@ function alterarStatus(status, action) {
         document.getElementById('energia-valor').textContent = `${personagem.statusAtual.energia}/${energiaMax}`;
         document.getElementById('energia-barra').style.width = `${(personagem.statusAtual.energia / energiaMax) * 100}%`;
     }
-    
+
+    // Atualiza também as barras HUD do cartão de ID
+    renderBarrasHud();
+
     salvarAutomaticamente();
 }
 
@@ -1689,33 +2232,6 @@ function adicionarItemInventario() {
     }
 }
 
-function mostrarModalRemoverItem() {
-    if (itensPersonalizados.length === 0) {
-        alert("Não há itens personalizados para remover!");
-        return;
-    }
-    
-    let mensagem = "Itens personalizados:\n\n";
-    itensPersonalizados.forEach((item, index) => {
-        mensagem += `${index + 1}. ${item}\n`;
-    });
-    
-    const escolha = prompt(`${mensagem}\nDigite o número do item a ser removido (1-${itensPersonalizados.length}):`);
-    
-    if (escolha) {
-        const index = parseInt(escolha) - 1;
-        if (index >= 0 && index < itensPersonalizados.length) {
-            if (confirm(`Remover item "${itensPersonalizados[index]}"?`)) {
-                itensPersonalizados.splice(index, 1);
-                personagem.itensPersonalizados = itensPersonalizados;
-                atualizarInventarioPersonalizado();
-                salvarAutomaticamente();
-            }
-        } else {
-            alert("Número inválido!");
-        }
-    }
-}
 
 // ===== FUNÇÕES DE NÍVEL E EXPERIÊNCIA =====
 function mostrarModalNivel() {
@@ -1923,11 +2439,14 @@ function salvarFicha() {
     
     // Salva no localStorage
     localStorage.setItem('neo-urbano-fichas', JSON.stringify(fichas));
-    
+
     // Atualiza contador e listas
     atualizarContadorFichas();
     atualizarListaFichasInicio();
     atualizarListaFichasSalvas();
+
+    // Também envia para a nuvem, se ativa (sincronização ao vivo)
+    agendarPushNuvem();
 }
 
 function carregarFichasSalvas() {
@@ -1935,23 +2454,38 @@ function carregarFichasSalvas() {
     return fichas;
 }
 
-function carregarFicha(idFicha) {
-    const fichas = carregarFichasSalvas();
-    const ficha = fichas.find(f => f.id === idFicha);
-    
-    if (!ficha) {
-        alert("Ficha não encontrada!");
-        return false;
-    }
-    
-    // Carrega dados da ficha
-    fichaAtualId = ficha.id;
-    Object.assign(personagem, ficha.personagem);
-    
-    // Garante que arrays existam
+// Normaliza/migra o personagem global após um Object.assign de dados carregados
+// (usado tanto pelo carregamento local quanto pelo da nuvem).
+function normalizarPersonagemCarregado() {
     if (!personagem.periciasEscolhidas) personagem.periciasEscolhidas = [];
     if (!personagem.habilidadesAdquiridas) personagem.habilidadesAdquiridas = [];
     if (!personagem.itensPersonalizados) personagem.itensPersonalizados = [];
+
+    // Migração de atributos antigos (malandragem/labia/recurso -> manha/proza/rede + intuicao)
+    if (personagem.atributos) {
+        const a = personagem.atributos;
+        if (a.manha === undefined && a.malandragem !== undefined) a.manha = a.malandragem;
+        if (a.proza === undefined && a.labia !== undefined) a.proza = a.labia;
+        if (a.rede === undefined && a.recurso !== undefined) a.rede = a.recurso;
+        ['carne', 'intuicao', 'foco', 'manha', 'proza', 'rede'].forEach(k => {
+            if (a[k] === undefined) a[k] = 1;
+        });
+        delete a.malandragem; delete a.labia; delete a.recurso;
+    }
+
+    // Garante maestrias e implantes do corpo (fichas antigas não têm)
+    if (!personagem.maestrias) {
+        personagem.maestrias = maestriasPadrao();
+    } else {
+        const base = maestriasPadrao();
+        Object.keys(base).forEach(k => { if (personagem.maestrias[k] === undefined) personagem.maestrias[k] = 0; });
+    }
+    if (!personagem.implantesCorpo) personagem.implantesCorpo = implantesCorpoPadrao();
+    else {
+        const baseC = implantesCorpoPadrao();
+        Object.keys(baseC).forEach(k => { if (!Array.isArray(personagem.implantesCorpo[k])) personagem.implantesCorpo[k] = []; });
+    }
+
     if (!personagem.medidores) {
         personagem.medidores = {
             ferimentos: Array(6).fill(false),
@@ -1966,16 +2500,33 @@ function carregarFicha(idFicha) {
             drogas: Array(6).fill(false)
         };
     }
-    
-    // Atualiza itens personalizados
+
+    if (!personagem.cor) personagem.cor = COR_PADRAO;
+    if (personagem.foto === undefined) personagem.foto = "";
+
+    regiaoCorpoSelecionada = null;
     itensPersonalizados = personagem.itensPersonalizados || [];
-    
-    // Mostra tela da ficha
+}
+
+// Aplica um objeto de personagem (de qualquer origem) na ficha e a exibe.
+function aplicarFichaCarregada(personagemData, id) {
+    fichaAtualId = id;
+    Object.assign(personagem, personagemData);
+    normalizarPersonagemCarregado();
     mostrarTela('tela-ficha');
-    
-    // Atualiza todos os dados
     atualizarFicha();
-    
+}
+
+function carregarFicha(idFicha) {
+    const fichas = carregarFichasSalvas();
+    const ficha = fichas.find(f => f.id === idFicha);
+
+    if (!ficha) {
+        alert("Ficha não encontrada!");
+        return false;
+    }
+
+    aplicarFichaCarregada(ficha.personagem, ficha.id);
     alert(`Ficha "${personagem.nome}" carregada com sucesso!`);
     return true;
 }
@@ -2001,9 +2552,12 @@ function salvarAutomaticamente() {
         }
         
         localStorage.setItem('neo-urbano-fichas', JSON.stringify(fichas));
-        
+
         // Atualiza contador
         atualizarContadorFichas();
+
+        // Sincroniza com a nuvem (debounced), se ativa
+        agendarPushNuvem();
     }
 }
 
@@ -2028,14 +2582,16 @@ function resetarPersonagem() {
         periciasExtrasDisponiveis: 0,
         atributos: {
             carne: 1,
-            malandragem: 1,
+            intuicao: 1,
             foco: 1,
-            recurso: 1,
-            labia: 1
+            manha: 1,
+            proza: 1,
+            rede: 1
         },
         periciasEscolhidas: [],
         habilidadesAdquiridas: [],
-        pontosAtributos: 6,
+        pontosAtributos: 7,
+        maestrias: maestriasPadrao(),
         detalhes: {
             idade: 25,
             altura: 175,
@@ -2043,9 +2599,12 @@ function resetarPersonagem() {
             historia: ""
         },
         hacks: "",
-        inventario: "Colete leve\nComunicador\nKit básico de ferramentas",
+        inventario: "",
         itensPersonalizados: [],
         implantes: "",
+        implantesCorpo: implantesCorpoPadrao(),
+        cor: COR_PADRAO,
+        foto: "",
         medidores: {
             ferimentos: Array(6).fill(false),
             estresse: Array(6).fill(false),
@@ -2069,6 +2628,7 @@ function resetarPersonagem() {
     fichaAtualId = null;
     atributoSelecionado = null;
     itensPersonalizados = [];
+    regiaoCorpoSelecionada = null;
     
     // Limpa campos do formulário
     const nomePersonagem = document.getElementById('nome-personagem');
@@ -2099,6 +2659,448 @@ function resetarPersonagem() {
     // Atualiza pontos
     atualizarPontosRestantes();
     atualizarContadorPericias();
-    
+
+    // Reseta a cor da ficha para o padrão
+    aplicarCorFicha(COR_PADRAO);
+
     console.log("Personagem resetado!");
+}
+
+// =====================================================================
+// ===== PERSONALIZAÇÃO (COR + FOTO) + CARTÃO DE ID + BOOT ==============
+// =====================================================================
+
+function inicializarPersonalizacao() {
+    // Monta os swatches de temas no modal
+    const cont = document.getElementById('cor-temas');
+    if (cont) {
+        cont.innerHTML = '';
+        temasFicha.forEach(t => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'cor-swatch';
+            b.style.background = t.cor;
+            b.title = t.nome;
+            b.setAttribute('data-cor', t.cor.toLowerCase());
+            b.addEventListener('click', () => definirCorFicha(t.cor));
+            cont.appendChild(b);
+        });
+    }
+    // Aplica o padrão de saída
+    aplicarCorFicha(COR_PADRAO);
+}
+
+function abrirModalPersonalizar() {
+    const modal = document.getElementById('modal-personalizar');
+    if (!modal) return;
+    const picker = document.getElementById('cor-picker');
+    if (picker) picker.value = personagem.cor || COR_PADRAO;
+    atualizarSwatchAtivo();
+    renderPreviewFoto();
+    modal.classList.add('active');
+}
+
+function definirCorFicha(cor) {
+    personagem.cor = cor || COR_PADRAO;
+    aplicarCorFicha(personagem.cor);
+    const picker = document.getElementById('cor-picker');
+    if (picker) picker.value = personagem.cor;
+    atualizarSwatchAtivo();
+    salvarAutomaticamente();
+}
+
+function atualizarSwatchAtivo() {
+    const atual = String(personagem.cor || COR_PADRAO).toLowerCase();
+    document.querySelectorAll('.cor-swatch').forEach(s => {
+        s.classList.toggle('ativo', (s.getAttribute('data-cor') || '') === atual);
+    });
+}
+
+// ----- FOTO -----
+function aoSelecionarFoto(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { alert('Selecione um arquivo de imagem.'); return; }
+    const reader = new FileReader();
+    reader.onload = ev => redimensionarFoto(ev.target.result);
+    reader.readAsDataURL(file);
+    e.target.value = ''; // permite re-selecionar o mesmo arquivo
+}
+
+// Redimensiona a imagem (max 420px, JPEG) para caber no localStorage e no Firestore (<1MB)
+function redimensionarFoto(dataUrl) {
+    const img = new Image();
+    img.onload = function () {
+        const MAX = 420;
+        let w = img.width, h = img.height;
+        const escala = Math.min(1, MAX / Math.max(w, h));
+        w = Math.round(w * escala);
+        h = Math.round(h * escala);
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        personagem.foto = canvas.toDataURL('image/jpeg', 0.82);
+        renderFotoFicha();
+        renderPreviewFoto();
+        salvarAutomaticamente();
+    };
+    img.onerror = () => alert('Não consegui ler essa imagem.');
+    img.src = dataUrl;
+}
+
+function removerFoto() {
+    personagem.foto = '';
+    renderFotoFicha();
+    renderPreviewFoto();
+    salvarAutomaticamente();
+}
+
+function renderPreviewFoto() {
+    const prev = document.getElementById('foto-preview');
+    const btnRem = document.getElementById('btn-remover-foto');
+    if (prev) {
+        if (personagem.foto) {
+            prev.style.backgroundImage = `url(${personagem.foto})`;
+            prev.classList.add('tem-foto');
+            prev.innerHTML = '';
+        } else {
+            prev.style.backgroundImage = 'none';
+            prev.classList.remove('tem-foto');
+            prev.innerHTML = '<i class="fas fa-user"></i>';
+        }
+    }
+    if (btnRem) btnRem.style.display = personagem.foto ? 'inline-flex' : 'none';
+}
+
+// ----- CARTÃO DE ID -----
+function renderFotoFicha() {
+    const av = document.getElementById('idcard-foto');
+    if (!av) return;
+    if (personagem.foto) {
+        av.style.backgroundImage = `url(${personagem.foto})`;
+        av.classList.add('tem-foto');
+        av.innerHTML = '';
+    } else {
+        av.style.backgroundImage = 'none';
+        av.classList.remove('tem-foto');
+        av.innerHTML = '<i class="fas fa-user-astronaut"></i>';
+    }
+}
+
+function renderIdCard() {
+    const nome = document.getElementById('idcard-nome');
+    if (nome && document.activeElement !== nome) nome.value = personagem.nome || '';
+
+    const classeNome = document.getElementById('idcard-classe');
+    if (classeNome) classeNome.textContent = personagem.classe ? personagem.classe.nome : '—';
+
+    const emblema = document.getElementById('idcard-emblema');
+    if (emblema) emblema.innerHTML = personagem.classe
+        ? `<i class="fas ${personagem.classe.icone}"></i>`
+        : '<i class="fas fa-user-secret"></i>';
+
+    const origem = document.getElementById('idcard-origem');
+    if (origem) origem.textContent = personagem.origem || '—';
+
+    const nivel = document.getElementById('idcard-nivel');
+    if (nivel) nivel.textContent = personagem.nivel || 1;
+
+    const xp = document.getElementById('idcard-xp');
+    if (xp) xp.textContent = `${personagem.xp || 0}/${personagem.xpProximoNivel || 100}`;
+
+    renderFotoFicha();
+    renderBarrasHud();
+}
+
+function renderBarrasHud() {
+    if (!personagem.atributos) return;
+    const vidaMax = 8 + (personagem.atributos.carne * 2);
+    const energiaMax = 6 + (personagem.atributos.carne * 2);
+    const vida = Math.max(0, Math.min(personagem.statusAtual.vida, vidaMax));
+    const energia = Math.max(0, Math.min(personagem.statusAtual.energia, energiaMax));
+    setBarraHud('hud-vida', vida, vidaMax);
+    setBarraHud('hud-energia', energia, energiaMax);
+}
+
+function setBarraHud(prefixo, atual, max) {
+    const fill = document.getElementById(prefixo + '-fill');
+    const txt = document.getElementById(prefixo + '-txt');
+    const wrap = document.getElementById(prefixo + '-wrap');
+    const pct = max > 0 ? (atual / max) * 100 : 0;
+    if (fill) fill.style.width = pct + '%';
+    if (txt) txt.textContent = `${atual}/${max}`;
+    if (wrap) wrap.classList.toggle('critico', pct <= 25);
+}
+
+// Edição inline do nome no cartão de ID
+function aoEditarNomeIdCard(e) {
+    personagem.nome = e.target.value;
+    const fichaNome = document.getElementById('ficha-nome');
+    if (fichaNome) fichaNome.textContent = personagem.nome || '---';
+    salvarAutomaticamente();
+}
+
+// ----- BOOT / TERMINAL -----
+function rodarBoot() {
+    const overlay = document.getElementById('boot-overlay');
+    if (!overlay) return;
+    overlay.classList.remove('escondido');
+    overlay.classList.add('ativo');
+    clearTimeout(window.__bootTimer);
+    window.__bootTimer = setTimeout(() => {
+        overlay.classList.remove('ativo');
+        overlay.classList.add('escondido');
+    }, 1500);
+}
+
+// ----- BOOT DE TERMINAL DA TELA INICIAL -----
+let introBootRodou = false;
+
+function novaLinhaTerminal(corpo) {
+    const d = document.createElement('div');
+    d.className = 'term-linha';
+    corpo.appendChild(d);
+    return d;
+}
+
+function runIntroBoot() {
+    const corpo = document.getElementById('terminal-corpo');
+    const menu = document.getElementById('intro-menu');
+    const boot = document.getElementById('intro-boot');
+    const skip = document.getElementById('terminal-skip');
+    if (!corpo || !menu) return;
+
+    introBootRodou = true;
+
+    const linhas = [
+        'NET-OS 2053 :: inicializando neuro-link',
+        'conectando ao backbone............ [OK]',
+        'montando sistema de fichas........ [OK]',
+        'descriptografando protocolos...... [OK]',
+        'ACESSO CONCEDIDO — bem-vindo, operador.'
+    ];
+
+    let li = 0, ci = 0, cancelado = false;
+    corpo.innerHTML = '';
+    let atual = novaLinhaTerminal(corpo);
+
+    function revelar() {
+        cancelado = true;
+        if (skip) skip.style.display = 'none';
+        const terminal = document.querySelector('#intro-boot .terminal');
+        if (terminal && !terminal.classList.contains('terminal-oculto')) {
+            // o terminal sai de cena; o menu aparece no espaço liberado
+            terminal.classList.add('terminal-saindo');
+            setTimeout(() => {
+                terminal.classList.add('terminal-oculto');
+                menu.classList.add('revelado');
+            }, 480);
+        } else {
+            menu.classList.add('revelado');
+        }
+    }
+
+    if (boot) {
+        boot.addEventListener('click', function () {
+            if (!menu.classList.contains('revelado')) revelar();
+        });
+    }
+
+    function tick() {
+        if (cancelado) return;
+        if (li >= linhas.length) { revelar(); return; }
+        const linha = linhas[li];
+        if (ci < linha.length) {
+            atual.textContent = '> ' + linha.slice(0, ci + 1);
+            ci++;
+            setTimeout(tick, 16);
+        } else {
+            li++; ci = 0;
+            if (li < linhas.length) atual = novaLinhaTerminal(corpo);
+            setTimeout(tick, 200);
+        }
+    }
+    tick();
+}
+
+// =====================================================================
+// ===== NUVEM (Firebase Firestore) ====================================
+// =====================================================================
+// Mantém o localStorage intacto: a nuvem é uma camada extra e opcional.
+// As fichas ficam em: mesas/{codigoMesa}/fichas/{fichaId}
+
+// Verifica se o firebase-config.js foi realmente preenchido
+function firebaseConfigurado() {
+    return typeof firebaseConfig !== 'undefined'
+        && firebaseConfig
+        && typeof firebaseConfig.apiKey === 'string'
+        && firebaseConfig.apiKey
+        && !firebaseConfig.apiKey.startsWith('COLE_AQUI');
+}
+
+function inicializarNuvem() {
+    // Recupera o código de mesa salvo
+    mesaCodigo = localStorage.getItem('neo-urbano-mesa') || '';
+    const inputMesa = document.getElementById('input-mesa');
+    if (inputMesa) inputMesa.value = mesaCodigo;
+
+    const avisoCfg = document.getElementById('nuvem-aviso-config');
+
+    if (typeof firebase === 'undefined' || !firebaseConfigurado()) {
+        cloudAtivo = false;
+        if (avisoCfg) avisoCfg.style.display = 'flex';
+        atualizarStatusNuvem();
+        return;
+    }
+
+    try {
+        if (!firebase.apps || !firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        db = firebase.firestore();
+        cloudAtivo = true;
+        if (avisoCfg) avisoCfg.style.display = 'none';
+    } catch (e) {
+        console.warn('Falha ao iniciar o Firebase:', e);
+        cloudAtivo = false;
+        if (avisoCfg) avisoCfg.style.display = 'flex';
+    }
+    atualizarStatusNuvem();
+}
+
+function colecaoFichasNuvem() {
+    if (!cloudAtivo || !mesaCodigo) return null;
+    return db.collection('mesas').doc(mesaCodigo).collection('fichas');
+}
+
+function atualizarStatusNuvem() {
+    const status = document.getElementById('nuvem-status');
+    if (!status) return;
+    if (!cloudAtivo) status.textContent = 'offline';
+    else if (!mesaCodigo) status.textContent = 'defina uma mesa';
+    else status.textContent = 'mesa: ' + mesaCodigo;
+}
+
+function abrirModalNuvem() {
+    const modal = document.getElementById('modal-nuvem');
+    if (!modal) return;
+    modal.classList.add('active');
+    atualizarStatusNuvem();
+    if (cloudAtivo && mesaCodigo) escutarFichasNuvem();
+}
+
+function definirMesa() {
+    const input = document.getElementById('input-mesa');
+    mesaCodigo = (input ? input.value : '').trim();
+    localStorage.setItem('neo-urbano-mesa', mesaCodigo);
+    atualizarStatusNuvem();
+    if (cloudAtivo && mesaCodigo) {
+        escutarFichasNuvem();
+    } else {
+        const lista = document.getElementById('nuvem-lista');
+        if (lista) lista.innerHTML = '<div class="nuvem-vazio">Defina um código de mesa para ver as fichas.</div>';
+    }
+}
+
+// Monta o registro que vai para a nuvem
+function montarRegistroNuvem(pers, id) {
+    return {
+        id: id,
+        personagem: JSON.parse(JSON.stringify(pers)),
+        nome: pers.nome || 'Sem nome',
+        classe: (pers.classe && pers.classe.nome) ? pers.classe.nome : '',
+        nivel: pers.nivel || 1,
+        atualizadoEm: Date.now()
+    };
+}
+
+function salvarFichaNuvem(silencioso) {
+    if (!cloudAtivo) { if (!silencioso) alert('A nuvem não está configurada (veja firebase-config.js).'); return; }
+    if (!mesaCodigo) { if (!silencioso) alert('Defina um código de mesa primeiro.'); return; }
+    if (!personagem.nome) { if (!silencioso) alert('A ficha precisa de um nome para ir à nuvem.'); return; }
+
+    const id = fichaAtualId || ('ficha_' + Date.now());
+    fichaAtualId = id;
+
+    colecaoFichasNuvem().doc(id).set(montarRegistroNuvem(personagem, id))
+        .then(() => { if (!silencioso) alert('Ficha salva na nuvem!'); })
+        .catch(e => { if (!silencioso) alert('Erro ao salvar na nuvem: ' + e.message); });
+}
+
+// Envio automático com debounce (chamado a cada alteração salva)
+function agendarPushNuvem() {
+    if (!cloudAtivo || !mesaCodigo || !personagem.nome || !fichaAtualId) return;
+    clearTimeout(cloudPushTimer);
+    cloudPushTimer = setTimeout(() => salvarFichaNuvem(true), 1500);
+}
+
+// Migração: envia todas as fichas locais para a mesa atual (sem apagar nada local)
+function enviarLocaisParaNuvem() {
+    if (!cloudAtivo) { alert('A nuvem não está configurada (veja firebase-config.js).'); return; }
+    if (!mesaCodigo) { alert('Defina um código de mesa primeiro.'); return; }
+
+    const fichas = JSON.parse(localStorage.getItem('neo-urbano-fichas') || '[]');
+    if (fichas.length === 0) { alert('Não há fichas locais para enviar.'); return; }
+    if (!confirm(`Enviar ${fichas.length} ficha(s) local(is) para a mesa "${mesaCodigo}"? As fichas locais continuam intactas.`)) return;
+
+    const col = colecaoFichasNuvem();
+    Promise.all(fichas.map(f => col.doc(f.id).set(montarRegistroNuvem(f.personagem || {}, f.id))))
+        .then(() => alert('Fichas locais enviadas para a nuvem!'))
+        .catch(e => alert('Erro ao enviar: ' + e.message));
+}
+
+function escutarFichasNuvem() {
+    const lista = document.getElementById('nuvem-lista');
+    const col = colecaoFichasNuvem();
+
+    if (!col) {
+        if (lista) lista.innerHTML = '<div class="nuvem-vazio">Defina um código de mesa para ver as fichas.</div>';
+        return;
+    }
+
+    if (unsubscribeNuvem) { unsubscribeNuvem(); unsubscribeNuvem = null; }
+    if (lista) lista.innerHTML = '<div class="nuvem-vazio">Conectando…</div>';
+
+    unsubscribeNuvem = col.orderBy('atualizadoEm', 'desc').onSnapshot(snap => {
+        atualizarStatusNuvem();
+        if (!lista) return;
+        if (snap.empty) {
+            lista.innerHTML = '<div class="nuvem-vazio">Nenhuma ficha nesta mesa ainda.</div>';
+            return;
+        }
+        lista.innerHTML = '';
+        snap.forEach(doc => {
+            const f = doc.data();
+            const div = document.createElement('div');
+            div.className = 'nuvem-ficha-item';
+            const ehAtual = doc.id === fichaAtualId;
+            div.innerHTML = `
+                <div class="nuvem-ficha-info">
+                    <div class="nuvem-ficha-nome">${escaparHTML(f.nome || 'Sem nome')} ${ehAtual ? '<span class="nuvem-tag">esta ficha</span>' : ''}</div>
+                    <div class="nuvem-ficha-det">${escaparHTML(f.classe || '—')} · Nível ${f.nivel || 1}</div>
+                </div>
+                <button class="btn-pequeno nuvem-abrir" data-id="${escaparHTML(doc.id)}"><i class="fas fa-folder-open"></i> Abrir</button>
+            `;
+            lista.appendChild(div);
+        });
+    }, err => {
+        console.warn('Erro no listener da nuvem:', err);
+        if (lista) lista.innerHTML = '<div class="nuvem-vazio">Erro ao ler a nuvem: ' + escaparHTML(err.message) + '</div>';
+    });
+}
+
+function abrirFichaNuvem(id) {
+    const col = colecaoFichasNuvem();
+    if (!col) return;
+    col.doc(id).get()
+        .then(doc => {
+            if (!doc.exists) { alert('Ficha não encontrada na nuvem.'); return; }
+            const f = doc.data();
+            aplicarFichaCarregada(f.personagem, id);
+            // Fecha o modal da nuvem
+            const modal = document.getElementById('modal-nuvem');
+            if (modal) modal.classList.remove('active');
+            alert(`Ficha "${personagem.nome}" aberta da nuvem. Alterações que você salvar voltam pra nuvem.`);
+        })
+        .catch(e => alert('Erro ao abrir da nuvem: ' + e.message));
 }
