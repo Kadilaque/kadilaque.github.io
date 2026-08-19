@@ -2176,6 +2176,9 @@ function atualizarUltimaAtualizacao() {
 
 // ===== FUNÇÕES DE CONTROLE =====
 function alterarStatus(status, action) {
+    // Vida/Energia também só o MESTRE altera (dano/cura). Jogador vê ao vivo.
+    if (!modoMestre) return;
+
     const vidaMax = 8 + (personagem.atributos.carne * 2);
     const energiaMax = 6 + (personagem.atributos.carne * 2);
     

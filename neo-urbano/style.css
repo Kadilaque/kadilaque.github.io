@@ -3860,6 +3860,9 @@ body::before {
 .quadrado { cursor: default; }
 body.modo-mestre .quadrado { cursor: pointer; }
 
+/* Botões +/- de vida/energia só no modo mestre (jogador vê ao vivo, não edita) */
+body:not(.modo-mestre) .controles-status { display: none; }
+
 /* Botão "voltar ao painel" só no modo mestre */
 #btn-voltar-painel { display: none; }
 body.modo-mestre #btn-voltar-painel { display: inline-flex; }
