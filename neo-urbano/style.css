@@ -3851,3 +3851,137 @@ body::before {
 /* ----- Fix: "Drogas" era cortada (3 colunas estouravam o card) ----- */
 .vicios-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
 .quadrados-container.pequeno { flex-wrap: wrap; }
+
+/* =====================================================================
+   PAINEL DO MESTRE
+   ===================================================================== */
+
+/* Medidores travados para o jogador (só o mestre altera) */
+.quadrado { cursor: default; }
+body.modo-mestre .quadrado { cursor: pointer; }
+
+/* Botão "voltar ao painel" só no modo mestre */
+#btn-voltar-painel { display: none; }
+body.modo-mestre #btn-voltar-painel { display: inline-flex; }
+
+.mestre-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(var(--accent-rgb), 0.3);
+}
+.mestre-header-tit h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.5rem;
+}
+.mestre-header-tit h2 i { color: var(--accent); }
+.mestre-mesa-tag { color: var(--cor-texto-escuro); font-size: 0.85rem; margin-top: 4px; }
+.mestre-mesa-tag b { color: var(--accent-2); }
+
+.mestre-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 16px;
+    align-items: start;
+}
+
+.mestre-card {
+    background: var(--cor-container);
+    border: 1px solid rgba(var(--accent-rgb), 0.3);
+    border-radius: 8px;
+    padding: 14px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+.mestre-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.mestre-foto {
+    flex: 0 0 auto;
+    width: 52px; height: 52px;
+    border: 2px solid var(--accent);
+    border-radius: 6px;
+    background: rgba(10, 14, 20, 0.7) center / cover no-repeat;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent); font-size: 1.2rem;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.3);
+}
+.mestre-id { flex: 1; min-width: 0; }
+.mestre-nome { font-family: 'Chakra Petch', sans-serif; font-weight: 700; color: var(--cor-texto-claro); font-size: 1.05rem; overflow-wrap: anywhere; }
+.mestre-sub { color: var(--cor-texto-escuro); font-size: 0.8rem; }
+.mestre-abrir { flex: 0 0 auto; }
+
+.mestre-vitais { display: flex; flex-direction: column; gap: 7px; margin-bottom: 10px; }
+.mestre-barra-row { display: flex; align-items: center; gap: 5px; }
+.mestre-barra-lbl { width: 34px; font-size: 0.66rem; letter-spacing: 0.5px; color: var(--cor-texto-escuro); flex: 0 0 auto; }
+.mestre-barra-track {
+    flex: 1; min-width: 0;
+    height: 16px; position: relative;
+    background: rgba(10, 14, 20, 0.85);
+    border: 1px solid rgba(var(--accent-rgb), 0.25);
+    border-radius: 3px; overflow: hidden;
+}
+.mestre-barra-fill { height: 100%; transition: width 0.3s ease; }
+.mestre-barra-fill.vida { background: linear-gradient(90deg, var(--cor-destaque-vermelho), #ff8a8a); }
+.mestre-barra-fill.energia { background: linear-gradient(90deg, var(--accent), #fff); }
+.mestre-barra-fill.critico { animation: hudPulse 0.8s ease-in-out infinite; }
+.mestre-barra-txt {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.68rem; font-weight: 700; color: #fff;
+    text-shadow: 0 0 3px #000, 0 0 3px #000;
+}
+
+.mini-btn {
+    flex: 0 0 auto;
+    min-width: 26px; height: 22px; padding: 0 6px;
+    background: rgba(var(--accent-rgb), 0.12);
+    border: 1px solid rgba(var(--accent-rgb), 0.4);
+    color: var(--cor-texto-claro);
+    border-radius: 4px; cursor: pointer;
+    font-family: 'Chakra Petch', sans-serif; font-size: 0.72rem; font-weight: 600;
+    transition: all 0.15s ease;
+}
+.mini-btn:hover { background: rgba(var(--accent-rgb), 0.28); border-color: var(--accent); }
+.mini-btn.dano { border-color: rgba(255, 71, 87, 0.5); color: #ff8a8a; }
+.mini-btn.dano:hover { background: rgba(255, 71, 87, 0.2); border-color: var(--cor-destaque-vermelho); }
+.mini-btn.cura { border-color: rgba(0, 255, 157, 0.5); color: #7effc4; }
+.mini-btn.cura:hover { background: rgba(0, 255, 157, 0.18); border-color: var(--cor-destaque-verde); }
+
+.mestre-xp-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; margin-bottom: 10px;
+    font-size: 0.82rem; color: var(--cor-texto-escuro);
+}
+.mestre-xp-row i { color: var(--accent-2); }
+.mestre-xp-row b { color: var(--cor-texto-claro); }
+.mestre-xp-btns { display: flex; gap: 5px; }
+
+.mestre-cond {
+    border-top: 1px solid var(--cor-borda);
+    padding-top: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+}
+.cond-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.cond-lbl { font-size: 0.72rem; color: var(--cor-texto-escuro); white-space: nowrap; }
+.cond-pips { display: flex; gap: 3px; }
+.cond-pip {
+    width: 12px; height: 12px;
+    border: 1px solid rgba(var(--accent-rgb), 0.35);
+    border-radius: 2px; cursor: pointer;
+    background: rgba(10, 14, 20, 0.6);
+    transition: all 0.15s ease;
+}
+.cond-pip:hover { border-color: var(--accent); }
+.cond-pip.on { background: var(--accent); box-shadow: 0 0 5px rgba(var(--accent-rgb), 0.6); border-color: var(--accent); }
+
+@media (max-width: 480px) {
+    .mestre-cond { grid-template-columns: 1fr; }
+    .mestre-grid { grid-template-columns: 1fr; }
+}

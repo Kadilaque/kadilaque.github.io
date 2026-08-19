@@ -46,6 +46,9 @@
                         <button id="btn-gerenciar-fichas" class="btn-secundario">
                             <i class="fas fa-cog"></i> GERENCIAR
                         </button>
+                        <button id="btn-modo-mestre" class="btn-secundario">
+                            <i class="fas fa-user-shield"></i> MODO MESTRE
+                        </button>
                     </div>
 
                     <div class="status-bar">
@@ -365,6 +368,9 @@
             <!-- Controles da Ficha -->
             <div class="ficha-controles">
                 <div class="controles-esquerda">
+                    <button id="btn-voltar-painel" class="btn-ficha">
+                        <i class="fas fa-arrow-left"></i> PAINEL DO MESTRE
+                    </button>
                     <button id="btn-novo-personagem" class="btn-ficha">
                         <i class="fas fa-plus-circle"></i> NOVO PERSONAGEM
                     </button>
@@ -866,6 +872,24 @@
         </div>
     </div>
 
+    <!-- Tela 8: Painel do Mestre -->
+    <div id="tela-mestre" class="tela">
+        <div class="container">
+            <div class="mestre-header">
+                <div class="mestre-header-tit">
+                    <h2><i class="fas fa-user-shield"></i> PAINEL DO <span class="destaque-magenta">MESTRE</span></h2>
+                    <div class="mestre-mesa-tag">Mesa: <b id="mestre-cod">—</b> · atualiza ao vivo</div>
+                </div>
+                <button id="btn-sair-mestre" class="btn-secundario">
+                    <i class="fas fa-arrow-left"></i> SAIR
+                </button>
+            </div>
+            <div id="mestre-grid" class="mestre-grid">
+                <div class="nuvem-vazio">Conectando…</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal de Subir de Nível -->
     <div id="modal-nivel" class="modal">
         <div class="modal-content">
@@ -1041,6 +1065,35 @@
             </div>
             <div class="modal-footer">
                 <button class="btn-principal modal-close"><i class="fas fa-check"></i> PRONTO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Modo Mestre (login) -->
+    <div id="modal-mestre" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-shield"></i> MODO <span class="destaque-magenta">MESTRE</span></h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="mestre-aviso-config" class="nuvem-aviso" style="display:none">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <span>Firebase não configurado — o modo mestre precisa da nuvem.</span>
+                </div>
+                <div class="form-group">
+                    <label for="mestre-mesa"><i class="fas fa-dungeon"></i> CÓDIGO DA MESA</label>
+                    <input type="text" id="mestre-mesa" placeholder="ex: cisne-2053" maxlength="40" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="mestre-senha"><i class="fas fa-key"></i> SENHA DO MESTRE</label>
+                    <input type="password" id="mestre-senha" placeholder="sua senha" maxlength="40" autocomplete="off">
+                </div>
+                <div class="form-hint">Na primeira vez, a senha que você digitar vira a senha do mestre desta mesa. Guarde-a bem.</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secundario modal-close">CANCELAR</button>
+                <button id="btn-mestre-entrar" class="btn-principal"><i class="fas fa-user-shield"></i> ENTRAR</button>
             </div>
         </div>
     </div>

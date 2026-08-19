@@ -365,8 +365,15 @@ let regiaoCorpoSelecionada = null;
 let db = null;                 // instância do Firestore
 let cloudAtivo = false;        // true quando o Firebase está configurado e iniciado
 let mesaCodigo = '';           // código da mesa (compartilhado entre jogadores e mestre)
-let unsubscribeNuvem = null;   // cancela o listener em tempo real
+let unsubscribeNuvem = null;   // cancela o listener em tempo real (gerenciador de fichas salvas)
 let cloudPushTimer = null;     // debounce do envio automático
+
+// ===== MESTRE / SYNC AO VIVO =====
+let modoMestre = false;            // true quando entrou no painel do mestre
+let fichaVivaId = null;            // id da ficha do jogador assinada ao vivo
+let unsubscribeFichaViva = null;   // cancela o listener da própria ficha (jogador)
+let unsubscribeMesaMestre = null;  // cancela o listener do dashboard do mestre
+let fichasMesaCache = {};          // id -> dados da ficha (para as ações rápidas do mestre)
 
 // ===== FUNÇÕES DE CONTROLE DE TELAS =====
 function mostrarTela(idTela) {
@@ -577,6 +584,10 @@ function inicializarQuadradinhos() {
 }
 
 function toggleQuadradinho(medidor, index) {
+    // Medidores (condições/necessidades/vícios) só o MESTRE altera.
+    // Para o jogador ficam travados — o mestre muda e reflete ao vivo.
+    if (!modoMestre) return;
+
     // Preenchimento cumulativo (tipo barra): clicar no quadrado i preenche do 1º até o i.
     const arr = personagem.medidores[medidor];
     if (!arr) return;
@@ -1413,6 +1424,41 @@ function configurarEventos() {
             const btn = e.target.closest('.nuvem-abrir');
             if (!btn) return;
             abrirFichaNuvem(btn.getAttribute('data-id'));
+        });
+    }
+
+    // ===== EVENTOS DO PAINEL DO MESTRE =====
+    const btnModoMestre = document.getElementById('btn-modo-mestre');
+    if (btnModoMestre) btnModoMestre.addEventListener('click', abrirModalMestre);
+
+    const btnMestreEntrar = document.getElementById('btn-mestre-entrar');
+    if (btnMestreEntrar) btnMestreEntrar.addEventListener('click', entrarModoMestre);
+
+    const mestreSenha = document.getElementById('mestre-senha');
+    if (mestreSenha) mestreSenha.addEventListener('keypress', function(e) { if (e.key === 'Enter') entrarModoMestre(); });
+
+    const btnSairMestre = document.getElementById('btn-sair-mestre');
+    if (btnSairMestre) btnSairMestre.addEventListener('click', sairModoMestre);
+
+    const btnVoltarPainel = document.getElementById('btn-voltar-painel');
+    if (btnVoltarPainel) btnVoltarPainel.addEventListener('click', function() {
+        mostrarTela('tela-mestre');
+        escutarMesaMestre();
+    });
+
+    // Ações rápidas do mestre (delegação — o grid é fixo)
+    const mestreGrid = document.getElementById('mestre-grid');
+    if (mestreGrid) {
+        mestreGrid.addEventListener('click', function(e) {
+            const abrir = e.target.closest('.mestre-abrir');
+            if (abrir) { mestreAbrirFicha(abrir.getAttribute('data-id')); return; }
+            const el = e.target.closest('[data-act]');
+            if (!el) return;
+            const act = el.getAttribute('data-act');
+            const id = el.getAttribute('data-id');
+            if (act === 'vida' || act === 'energia') mestreAlterarStatus(id, act, parseInt(el.getAttribute('data-delta'), 10));
+            else if (act === 'xp') mestreAlterarXP(id, parseInt(el.getAttribute('data-delta'), 10));
+            else if (act === 'cond') mestreCondicao(id, el.getAttribute('data-med'), parseInt(el.getAttribute('data-i'), 10));
         });
     }
 
@@ -3023,7 +3069,10 @@ function salvarFichaNuvem(silencioso) {
     fichaAtualId = id;
 
     colecaoFichasNuvem().doc(id).set(montarRegistroNuvem(personagem, id))
-        .then(() => { if (!silencioso) alert('Ficha salva na nuvem!'); })
+        .then(() => {
+            assinarFichaAoVivo(id); // passa a receber ao vivo o que o mestre mudar
+            if (!silencioso) alert('Ficha salva na nuvem!');
+        })
         .catch(e => { if (!silencioso) alert('Erro ao salvar na nuvem: ' + e.message); });
 }
 
@@ -3097,10 +3146,255 @@ function abrirFichaNuvem(id) {
             if (!doc.exists) { alert('Ficha não encontrada na nuvem.'); return; }
             const f = doc.data();
             aplicarFichaCarregada(f.personagem, id);
+            assinarFichaAoVivo(id);
             // Fecha o modal da nuvem
             const modal = document.getElementById('modal-nuvem');
             if (modal) modal.classList.remove('active');
             alert(`Ficha "${personagem.nome}" aberta da nuvem. Alterações que você salvar voltam pra nuvem.`);
         })
         .catch(e => alert('Erro ao abrir da nuvem: ' + e.message));
+}
+
+// ===== SYNC AO VIVO DA PRÓPRIA FICHA (jogador vê o que o mestre muda) =====
+function assinarFichaAoVivo(id) {
+    if (!cloudAtivo || !mesaCodigo || !id) return;
+    if (id === fichaVivaId && unsubscribeFichaViva) return; // já assinado
+    if (unsubscribeFichaViva) { unsubscribeFichaViva(); unsubscribeFichaViva = null; }
+    fichaVivaId = id;
+    const col = colecaoFichasNuvem();
+    if (!col) return;
+    unsubscribeFichaViva = col.doc(id).onSnapshot(doc => {
+        if (!doc.exists) return;
+        if (doc.metadata && doc.metadata.hasPendingWrites) return; // mudança local, ignora
+        const f = doc.data();
+        if (f && f.personagem) aplicarCamposMestre(f.personagem);
+    }, err => console.warn('Erro no sync ao vivo da ficha:', err));
+}
+
+// Aplica só os campos que o mestre controla (medidores, vida/energia, nível, xp)
+function aplicarCamposMestre(remoto) {
+    let mudou = false;
+    if (remoto.medidores) { personagem.medidores = remoto.medidores; mudou = true; }
+    if (remoto.statusAtual) { personagem.statusAtual = remoto.statusAtual; mudou = true; }
+    if (typeof remoto.nivel === 'number') { personagem.nivel = remoto.nivel; mudou = true; }
+    if (typeof remoto.xp === 'number') { personagem.xp = remoto.xp; mudou = true; }
+    // Notas do mestre são secretas — não aplicamos/mostramos nada delas aqui.
+    const telaFicha = document.getElementById('tela-ficha');
+    if (mudou && telaFicha && telaFicha.classList.contains('ativa')) {
+        renderCamposMestreUI();
+    }
+}
+
+// Atualiza SÓ o que o mestre controla, sem re-renderizar a ficha inteira
+// (evita apagar o que o jogador está digitando em textareas).
+function renderCamposMestreUI() {
+    if (!personagem.atributos) return;
+    atualizarQuadradinhos();
+
+    const vidaMax = 8 + (personagem.atributos.carne * 2);
+    const energiaMax = 6 + (personagem.atributos.carne * 2);
+    const vidaAtual = Math.max(0, Math.min(personagem.statusAtual.vida, vidaMax));
+    const energiaAtual = Math.max(0, Math.min(personagem.statusAtual.energia, energiaMax));
+
+    const vv = document.getElementById('vida-valor'); if (vv) vv.textContent = `${vidaAtual}/${vidaMax}`;
+    const vb = document.getElementById('vida-barra'); if (vb) vb.style.width = `${(vidaAtual / vidaMax) * 100}%`;
+    const ev = document.getElementById('energia-valor'); if (ev) ev.textContent = `${energiaAtual}/${energiaMax}`;
+    const eb = document.getElementById('energia-barra'); if (eb) eb.style.width = `${(energiaAtual / energiaMax) * 100}%`;
+    renderBarrasHud();
+
+    const fn = document.getElementById('ficha-nivel'); if (fn) fn.textContent = personagem.nivel;
+    const fx = document.getElementById('ficha-xp'); if (fx) fx.textContent = personagem.xp;
+    const idn = document.getElementById('idcard-nivel'); if (idn) idn.textContent = personagem.nivel || 1;
+    const idx = document.getElementById('idcard-xp'); if (idx) idx.textContent = `${personagem.xp || 0}/${personagem.xpProximoNivel || 100}`;
+}
+
+// =====================================================================
+// ===== PAINEL DO MESTRE ==============================================
+// =====================================================================
+
+const medidoresMestre = [
+    { k: 'ferimentos', n: 'Ferimentos' }, { k: 'estresse', n: 'Estresse' }, { k: 'exposicao', n: 'Exposição' },
+    { k: 'fome', n: 'Fome' }, { k: 'sede', n: 'Sede' }, { k: 'sono', n: 'Sono' }, { k: 'higiene', n: 'Higiene' },
+    { k: 'alcool', n: 'Álcool' }, { k: 'cigarro', n: 'Cigarro' }, { k: 'drogas', n: 'Drogas' }
+];
+
+function abrirModalMestre() {
+    const modal = document.getElementById('modal-mestre');
+    if (!modal) return;
+    const aviso = document.getElementById('mestre-aviso-config');
+    if (aviso) aviso.style.display = cloudAtivo ? 'none' : 'flex';
+    const im = document.getElementById('mestre-mesa'); if (im) im.value = mesaCodigo || '';
+    const is = document.getElementById('mestre-senha'); if (is) is.value = '';
+    modal.classList.add('active');
+    setTimeout(() => { const alvo = mesaCodigo ? is : im; if (alvo) alvo.focus(); }, 60);
+}
+
+function fecharModalMestre() {
+    const m = document.getElementById('modal-mestre');
+    if (m) m.classList.remove('active');
+}
+
+function entrarModoMestre() {
+    if (!cloudAtivo) { alert('A nuvem não está configurada — o modo mestre precisa dela.'); return; }
+    const mesa = (document.getElementById('mestre-mesa')?.value || '').trim();
+    const senha = (document.getElementById('mestre-senha')?.value || '');
+    if (!mesa) { alert('Informe o código da mesa.'); return; }
+    if (!senha) { alert('Informe a senha do mestre.'); return; }
+
+    mesaCodigo = mesa;
+    localStorage.setItem('neo-urbano-mesa', mesa);
+
+    const btn = document.getElementById('btn-mestre-entrar');
+    if (btn) { btn.disabled = true; btn.textContent = 'Verificando…'; }
+
+    const mesaRef = db.collection('mesas').doc(mesa);
+    mesaRef.get().then(snap => {
+        const data = snap.exists ? snap.data() : null;
+        if (!data || !data.mestrePass) {
+            if (!confirm(`A mesa "${mesa}" ainda não tem mestre.\nDefinir esta senha como a senha do mestre desta mesa?`)) {
+                throw { _cancel: true };
+            }
+            return mesaRef.set({ mestrePass: senha, criadaEm: Date.now() }, { merge: true });
+        }
+        if (data.mestrePass !== senha) { alert('Senha do mestre incorreta.'); throw { _cancel: true }; }
+    }).then(() => {
+        modoMestre = true;
+        document.body.classList.add('modo-mestre');
+        fecharModalMestre();
+        mostrarTela('tela-mestre');
+        escutarMesaMestre();
+    }).catch(e => {
+        if (!e || !e._cancel) alert('Erro ao entrar como mestre: ' + (e && e.message ? e.message : e));
+    }).finally(() => {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-user-shield"></i> ENTRAR'; }
+    });
+}
+
+function sairModoMestre() {
+    modoMestre = false;
+    document.body.classList.remove('modo-mestre');
+    if (unsubscribeMesaMestre) { unsubscribeMesaMestre(); unsubscribeMesaMestre = null; }
+    mostrarTela('tela-intro');
+}
+
+function escutarMesaMestre() {
+    const grid = document.getElementById('mestre-grid');
+    const col = colecaoFichasNuvem();
+    const codEl = document.getElementById('mestre-cod'); if (codEl) codEl.textContent = mesaCodigo || '—';
+    if (!col) { if (grid) grid.innerHTML = '<div class="nuvem-vazio">Defina uma mesa.</div>'; return; }
+    if (unsubscribeMesaMestre) { unsubscribeMesaMestre(); unsubscribeMesaMestre = null; }
+    if (grid) grid.innerHTML = '<div class="nuvem-vazio">Conectando…</div>';
+
+    unsubscribeMesaMestre = col.orderBy('atualizadoEm', 'desc').onSnapshot(snap => {
+        fichasMesaCache = {};
+        if (!grid) return;
+        if (snap.empty) { grid.innerHTML = '<div class="nuvem-vazio">Nenhuma ficha nesta mesa ainda.</div>'; return; }
+        grid.innerHTML = '';
+        snap.forEach(doc => {
+            fichasMesaCache[doc.id] = doc.data();
+            grid.appendChild(criarCardMestre(doc.id, doc.data()));
+        });
+    }, err => { if (grid) grid.innerHTML = '<div class="nuvem-vazio">Erro: ' + escaparHTML(err.message) + '</div>'; });
+}
+
+function barraMestre(label, val, max, tipo, id) {
+    const pct = max > 0 ? Math.max(0, Math.min(100, (val / max) * 100)) : 0;
+    const critico = pct <= 25 ? ' critico' : '';
+    return `
+      <div class="mestre-barra-row">
+        <span class="mestre-barra-lbl">${label}</span>
+        <button class="mini-btn dano" data-act="${tipo}" data-id="${id}" data-delta="-5">−5</button>
+        <button class="mini-btn dano" data-act="${tipo}" data-id="${id}" data-delta="-1">−1</button>
+        <div class="mestre-barra-track"><div class="mestre-barra-fill ${tipo}${critico}" style="width:${pct}%"></div><span class="mestre-barra-txt">${val}/${max}</span></div>
+        <button class="mini-btn cura" data-act="${tipo}" data-id="${id}" data-delta="1">+1</button>
+        <button class="mini-btn cura" data-act="${tipo}" data-id="${id}" data-delta="5">+5</button>
+      </div>`;
+}
+
+function grupoCondicoesMestre(id, p) {
+    const med = p.medidores || {};
+    return medidoresMestre.map(m => {
+        const arr = med[m.k] || [];
+        let nivel = 0; arr.forEach((v, i) => { if (v) nivel = i + 1; });
+        let pips = '';
+        for (let i = 0; i < 6; i++) {
+            pips += `<span class="cond-pip ${i < nivel ? 'on' : ''}" data-act="cond" data-id="${id}" data-med="${m.k}" data-i="${i}"></span>`;
+        }
+        return `<div class="cond-row"><span class="cond-lbl">${m.n}</span><span class="cond-pips">${pips}</span></div>`;
+    }).join('');
+}
+
+function criarCardMestre(id, f) {
+    const p = f.personagem || {};
+    const carne = (p.atributos && p.atributos.carne) || 1;
+    const vidaMax = 8 + carne * 2, energiaMax = 6 + carne * 2;
+    const vida = (p.statusAtual && typeof p.statusAtual.vida === 'number') ? p.statusAtual.vida : vidaMax;
+    const energia = (p.statusAtual && typeof p.statusAtual.energia === 'number') ? p.statusAtual.energia : energiaMax;
+    const foto = p.foto || '';
+
+    const card = document.createElement('div');
+    card.className = 'mestre-card';
+    card.innerHTML = `
+      <div class="mestre-card-top">
+        <div class="mestre-foto"${foto ? ` style="background-image:url(${foto})"` : ''}>${foto ? '' : '<i class="fas fa-user-astronaut"></i>'}</div>
+        <div class="mestre-id">
+          <div class="mestre-nome">${escaparHTML(f.nome || 'Sem nome')}</div>
+          <div class="mestre-sub">${escaparHTML(f.classe || '—')} · Nível ${f.nivel || 1}</div>
+        </div>
+        <button class="btn-pequeno mestre-abrir" data-id="${id}"><i class="fas fa-pen"></i> Abrir</button>
+      </div>
+      <div class="mestre-vitais">
+        ${barraMestre('VIDA', vida, vidaMax, 'vida', id)}
+        ${barraMestre('EN', energia, energiaMax, 'energia', id)}
+      </div>
+      <div class="mestre-xp-row">
+        <span><i class="fas fa-star"></i> XP <b>${p.xp || 0}</b>/${p.xpProximoNivel || 100}</span>
+        <span class="mestre-xp-btns">
+          <button class="mini-btn" data-act="xp" data-id="${id}" data-delta="5">+5</button>
+          <button class="mini-btn" data-act="xp" data-id="${id}" data-delta="25">+25</button>
+          <button class="mini-btn dano" data-act="xp" data-id="${id}" data-delta="-5">−5</button>
+        </span>
+      </div>
+      <div class="mestre-cond">${grupoCondicoesMestre(id, p)}</div>
+    `;
+    return card;
+}
+
+function mestreAlterarStatus(id, tipo, delta) {
+    const f = fichasMesaCache[id]; if (!f) return;
+    const p = f.personagem || {};
+    const carne = (p.atributos && p.atributos.carne) || 1;
+    const max = (tipo === 'vida' ? 8 : 6) + carne * 2;
+    const atual = (p.statusAtual && typeof p.statusAtual[tipo] === 'number') ? p.statusAtual[tipo] : max;
+    const novo = Math.max(0, Math.min(max, atual + delta));
+    colecaoFichasNuvem().doc(id).update({ ['personagem.statusAtual.' + tipo]: novo, atualizadoEm: Date.now() })
+        .catch(e => alert('Erro: ' + e.message));
+}
+
+function mestreAlterarXP(id, delta) {
+    const f = fichasMesaCache[id]; if (!f) return;
+    const p = f.personagem || {};
+    const novo = Math.max(0, (p.xp || 0) + delta);
+    colecaoFichasNuvem().doc(id).update({ 'personagem.xp': novo, atualizadoEm: Date.now() })
+        .catch(e => alert('Erro: ' + e.message));
+}
+
+function mestreCondicao(id, med, i) {
+    const f = fichasMesaCache[id]; if (!f) return;
+    const p = f.personagem || {};
+    const arr = (p.medidores && Array.isArray(p.medidores[med])) ? p.medidores[med].slice() : Array(6).fill(false);
+    let maxTrue = -1; arr.forEach((v, idx) => { if (v) maxTrue = idx; });
+    const nivel = (arr[i] && i === maxTrue) ? i : i + 1;
+    const novo = []; for (let k = 0; k < 6; k++) novo[k] = k < nivel;
+    colecaoFichasNuvem().doc(id).update({ ['personagem.medidores.' + med]: novo, atualizadoEm: Date.now() })
+        .catch(e => alert('Erro: ' + e.message));
+}
+
+function mestreAbrirFicha(id) {
+    const col = colecaoFichasNuvem(); if (!col) return;
+    col.doc(id).get().then(doc => {
+        if (!doc.exists) { alert('Ficha não encontrada na nuvem.'); return; }
+        aplicarFichaCarregada(doc.data().personagem, id);
+        assinarFichaAoVivo(id);
+    }).catch(e => alert('Erro ao abrir: ' + e.message));
 }
