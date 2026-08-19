@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CyberPunk 2053 | Sistema de Fichas</title>
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css?v=6">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
@@ -881,6 +881,7 @@
                     <div class="mestre-mesa-tag">Mesa: <b id="mestre-cod">—</b> · atualiza ao vivo</div>
                 </div>
                 <div class="mestre-header-acoes">
+                    <button id="btn-add-nota" class="btn-secundario"><i class="fas fa-note-sticky"></i> + Nota</button>
                     <button id="btn-add-npc" class="btn-secundario"><i class="fas fa-skull"></i> + NPC</button>
                     <button id="btn-sair-mestre" class="btn-secundario"><i class="fas fa-arrow-left"></i> SAIR</button>
                 </div>
@@ -900,6 +901,11 @@
                 <div id="combate-lista" class="combate-lista">
                     <div class="nuvem-vazio">Sem combatentes. Use "+ Jogadores" ou "+ Combate" num NPC.</div>
                 </div>
+            </div>
+
+            <h3 class="mestre-secao"><i class="fas fa-note-sticky"></i> NOTAS DO MESTRE</h3>
+            <div id="mestre-notas-grid" class="notas-grid">
+                <div class="nuvem-vazio">Nenhuma nota ainda. Use "+ Nota".</div>
             </div>
 
             <h3 class="mestre-secao"><i class="fas fa-users"></i> JOGADORES</h3>
@@ -1122,20 +1128,27 @@
         </div>
     </div>
 
-    <!-- Modal Notas do Mestre -->
-    <div id="modal-notas" class="modal">
+    <!-- Modal Nota do Mestre (título + texto) -->
+    <div id="modal-nota" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-user-secret"></i> NOTAS DO MESTRE — <span id="notas-titulo" class="destaque-magenta"></span></h2>
+                <h2><i class="fas fa-note-sticky"></i> <span id="modal-nota-titulo" class="destaque-magenta">NOVA NOTA</span></h2>
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="form-hint">Só você vê. Segredos, ganchos, o que o jogador não sabe…</div>
-                <textarea id="notas-texto" class="ficha-textarea" rows="8" placeholder="Anotações secretas sobre este personagem..."></textarea>
+                <div class="form-group">
+                    <label for="nota-titulo-input"><i class="fas fa-heading"></i> TÍTULO</label>
+                    <input type="text" id="nota-titulo-input" placeholder="Ex: Segredo do Fixer, Plano da corporação..." maxlength="60" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="nota-texto-input"><i class="fas fa-align-left"></i> TEXTO</label>
+                    <textarea id="nota-texto-input" class="ficha-textarea" rows="7" placeholder="Escreva a nota..." maxlength="1500"></textarea>
+                </div>
+                <div class="form-hint">Só o mestre vê. Some quantas notas quiser.</div>
             </div>
             <div class="modal-footer">
                 <button class="btn-secundario modal-close">CANCELAR</button>
-                <button id="btn-salvar-notas" class="btn-principal"><i class="fas fa-save"></i> SALVAR</button>
+                <button id="btn-salvar-nota" class="btn-principal"><i class="fas fa-save"></i> SALVAR</button>
             </div>
         </div>
     </div>
@@ -1216,8 +1229,8 @@
     <!-- Firebase (nuvem) — SDK compat + configuração -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js?v=5"></script>
+    <script src="firebase-config.js?v=6"></script>
 
-    <script src="script.js?v=5"></script>
+    <script src="script.js?v=6"></script>
 </body>
 </html>

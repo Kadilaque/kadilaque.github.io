@@ -1444,8 +1444,21 @@ function configurarEventos() {
     const btnSairMestre = document.getElementById('btn-sair-mestre');
     if (btnSairMestre) btnSairMestre.addEventListener('click', sairModoMestre);
 
-    const btnSalvarNotas = document.getElementById('btn-salvar-notas');
-    if (btnSalvarNotas) btnSalvarNotas.addEventListener('click', salvarNotasMestre);
+    // Painel de notas
+    const btnAddNota = document.getElementById('btn-add-nota');
+    if (btnAddNota) btnAddNota.addEventListener('click', () => abrirModalNota(null));
+
+    const btnSalvarNota = document.getElementById('btn-salvar-nota');
+    if (btnSalvarNota) btnSalvarNota.addEventListener('click', salvarNota);
+
+    const notasGrid = document.getElementById('mestre-notas-grid');
+    if (notasGrid) {
+        notasGrid.addEventListener('click', function(e) {
+            const rm = e.target.closest('.nota-remover'); if (rm) { removerNota(rm.getAttribute('data-id')); return; }
+            const ed = e.target.closest('.nota-editar'); if (ed) { abrirModalNota(ed.getAttribute('data-id')); return; }
+            const card = e.target.closest('.nota-card'); if (card) abrirModalNota(card.getAttribute('data-id'));
+        });
+    }
 
     // NPCs
     const btnAddNpc = document.getElementById('btn-add-npc');
@@ -1500,8 +1513,6 @@ function configurarEventos() {
         mestreGrid.addEventListener('click', function(e) {
             const abrir = e.target.closest('.mestre-abrir');
             if (abrir) { mestreAbrirFicha(abrir.getAttribute('data-id')); return; }
-            const notas = e.target.closest('.mestre-notas');
-            if (notas) { abrirNotasMestre(notas.getAttribute('data-id')); return; }
             const el = e.target.closest('[data-act]');
             if (!el) return;
             const act = el.getAttribute('data-act');
@@ -3351,6 +3362,7 @@ function sairModoMestre() {
     if (unsubscribeMesaMestre) { unsubscribeMesaMestre(); unsubscribeMesaMestre = null; }
     if (unsubscribeNpcs) { unsubscribeNpcs(); unsubscribeNpcs = null; }
     if (unsubscribeCombate) { unsubscribeCombate(); unsubscribeCombate = null; }
+    if (unsubscribeNotas) { unsubscribeNotas(); unsubscribeNotas = null; }
     mostrarTela('tela-intro');
 }
 
@@ -3373,9 +3385,10 @@ function escutarMesaMestre() {
         });
     }, err => { if (grid) grid.innerHTML = '<div class="nuvem-vazio">Erro: ' + escaparHTML(err.message) + '</div>'; });
 
-    // NPCs e tracker de combate (ao vivo)
+    // NPCs, tracker de combate e notas (ao vivo)
     escutarNpcsMestre();
     escutarCombate();
+    escutarNotas();
 }
 
 function barraMestre(label, val, max, tipo, id) {
@@ -3437,11 +3450,6 @@ function criarCardMestre(id, f) {
         </span>
       </div>
       <div class="mestre-cond">${grupoCondicoesMestre(id, p)}</div>
-      <div class="mestre-card-footer">
-        <button class="btn-pequeno mestre-notas${f.notasMestre ? ' tem-nota' : ''}" data-id="${id}">
-          <i class="fas fa-user-secret"></i> Notas${f.notasMestre ? ' •' : ''}
-        </button>
-      </div>
     `;
     return card;
 }
@@ -3485,28 +3493,80 @@ function mestreAbrirFicha(id) {
     }).catch(e => alert('Erro ao abrir: ' + e.message));
 }
 
-// ----- Anotações secretas do mestre (por jogador) -----
-let notasMestreId = null;
+// ----- Painel de NOTAS do mestre (várias notas, cada uma com título) -----
+let unsubscribeNotas = null;
+let notasCache = {};
+let notaEditId = null;
 
-function abrirNotasMestre(id) {
-    const f = fichasMesaCache[id]; if (!f) return;
-    notasMestreId = id;
-    const modal = document.getElementById('modal-notas');
-    if (!modal) return;
-    const tit = document.getElementById('notas-titulo'); if (tit) tit.textContent = f.nome || 'Sem nome';
-    const ta = document.getElementById('notas-texto'); if (ta) ta.value = f.notasMestre || '';
-    modal.classList.add('active');
-    if (ta) setTimeout(() => ta.focus(), 60);
+function colecaoNotas() {
+    if (!cloudAtivo || !mesaCodigo) return null;
+    return db.collection('mesas').doc(mesaCodigo).collection('notas');
 }
 
-function salvarNotasMestre() {
-    if (!notasMestreId) return;
-    const ta = document.getElementById('notas-texto');
-    const texto = ta ? ta.value : '';
-    colecaoFichasNuvem().doc(notasMestreId).set({ notasMestre: texto, atualizadoEm: Date.now() }, { merge: true })
-        .catch(e => alert('Erro ao salvar notas: ' + e.message));
-    const modal = document.getElementById('modal-notas');
-    if (modal) modal.classList.remove('active');
+function escutarNotas() {
+    const grid = document.getElementById('mestre-notas-grid');
+    const col = colecaoNotas();
+    if (!col) return;
+    if (unsubscribeNotas) { unsubscribeNotas(); unsubscribeNotas = null; }
+    unsubscribeNotas = col.orderBy('criadoEm', 'desc').onSnapshot(snap => {
+        notasCache = {};
+        if (!grid) return;
+        if (snap.empty) { grid.innerHTML = '<div class="nuvem-vazio">Nenhuma nota ainda. Use "+ Nota".</div>'; return; }
+        grid.innerHTML = '';
+        snap.forEach(doc => { notasCache[doc.id] = doc.data(); grid.appendChild(criarCardNota(doc.id, doc.data())); });
+    }, err => { if (grid) grid.innerHTML = '<div class="nuvem-vazio">Erro: ' + escaparHTML(err.message) + '</div>'; });
+}
+
+function criarCardNota(id, n) {
+    const div = document.createElement('div');
+    div.className = 'nota-card';
+    div.setAttribute('data-id', id);
+    div.innerHTML = `
+      <div class="nota-card-head">
+        <div class="nota-titulo"><i class="fas fa-thumbtack"></i> ${escaparHTML(n.titulo || 'Sem título')}</div>
+        <div class="nota-acoes">
+          <button class="btn-pequeno nota-editar" data-id="${id}" title="Editar"><i class="fas fa-pen"></i></button>
+          <button class="btn-pequeno nota-remover" data-id="${id}" title="Remover"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+      <div class="nota-texto">${escaparHTML(n.texto || '')}</div>
+    `;
+    return div;
+}
+
+function abrirModalNota(id) {
+    if (!colecaoNotas()) { alert('Defina a mesa primeiro.'); return; }
+    notaEditId = id || null;
+    const modal = document.getElementById('modal-nota'); if (!modal) return;
+    const n = id ? (notasCache[id] || {}) : {};
+    document.getElementById('nota-titulo-input').value = n.titulo || '';
+    document.getElementById('nota-texto-input').value = n.texto || '';
+    const tit = document.getElementById('modal-nota-titulo'); if (tit) tit.textContent = id ? 'EDITAR NOTA' : 'NOVA NOTA';
+    modal.classList.add('active');
+    setTimeout(() => document.getElementById('nota-titulo-input').focus(), 60);
+}
+
+function salvarNota() {
+    const col = colecaoNotas(); if (!col) { alert('Defina a mesa primeiro.'); return; }
+    const titulo = (document.getElementById('nota-titulo-input').value || '').trim();
+    const texto = (document.getElementById('nota-texto-input').value || '').trim();
+    if (!titulo && !texto) { alert('Escreva um título ou um texto.'); return; }
+
+    if (notaEditId) {
+        col.doc(notaEditId).set({ titulo, texto, atualizadoEm: Date.now() }, { merge: true })
+            .catch(e => alert('Erro: ' + e.message));
+    } else {
+        const id = 'nota_' + Date.now();
+        col.doc(id).set({ id, titulo, texto, criadoEm: Date.now(), atualizadoEm: Date.now() })
+            .catch(e => alert('Erro: ' + e.message));
+    }
+    document.getElementById('modal-nota').classList.remove('active');
+}
+
+function removerNota(id) {
+    const n = notasCache[id];
+    if (!confirm(`Remover a nota "${n ? (n.titulo || 'sem título') : ''}"?`)) return;
+    colecaoNotas().doc(id).delete().catch(e => alert('Erro: ' + e.message));
 }
 
 // ===== NPCs / INIMIGOS =====
