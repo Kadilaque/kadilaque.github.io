@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CyberPunk 2053 | Sistema de Fichas</title>
-    <link rel="stylesheet" href="style.css?v=4">
+    <link rel="stylesheet" href="style.css?v=5">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
@@ -880,12 +880,36 @@
                     <h2><i class="fas fa-user-shield"></i> PAINEL DO <span class="destaque-magenta">MESTRE</span></h2>
                     <div class="mestre-mesa-tag">Mesa: <b id="mestre-cod">—</b> · atualiza ao vivo</div>
                 </div>
-                <button id="btn-sair-mestre" class="btn-secundario">
-                    <i class="fas fa-arrow-left"></i> SAIR
-                </button>
+                <div class="mestre-header-acoes">
+                    <button id="btn-add-npc" class="btn-secundario"><i class="fas fa-skull"></i> + NPC</button>
+                    <button id="btn-sair-mestre" class="btn-secundario"><i class="fas fa-arrow-left"></i> SAIR</button>
+                </div>
             </div>
+
+            <!-- Tracker de combate / iniciativa -->
+            <div class="combate-painel" id="combate-painel">
+                <div class="combate-head">
+                    <h3><i class="fas fa-khanda"></i> COMBATE · Rodada <span id="combate-rodada">1</span></h3>
+                    <div class="combate-acoes">
+                        <button id="btn-combate-jogadores" class="btn-pequeno"><i class="fas fa-users"></i> + Jogadores</button>
+                        <button id="btn-combate-proximo" class="btn-pequeno"><i class="fas fa-forward"></i> Próximo</button>
+                        <button id="btn-combate-rodada" class="btn-pequeno"><i class="fas fa-rotate"></i> Nova rodada</button>
+                        <button id="btn-combate-limpar" class="btn-pequeno"><i class="fas fa-trash"></i> Limpar</button>
+                    </div>
+                </div>
+                <div id="combate-lista" class="combate-lista">
+                    <div class="nuvem-vazio">Sem combatentes. Use "+ Jogadores" ou "+ Combate" num NPC.</div>
+                </div>
+            </div>
+
+            <h3 class="mestre-secao"><i class="fas fa-users"></i> JOGADORES</h3>
             <div id="mestre-grid" class="mestre-grid">
                 <div class="nuvem-vazio">Conectando…</div>
+            </div>
+
+            <h3 class="mestre-secao"><i class="fas fa-skull"></i> NPCs / INIMIGOS</h3>
+            <div id="mestre-npcs" class="mestre-grid">
+                <div class="nuvem-vazio">Nenhum NPC/inimigo ainda. Use "+ NPC".</div>
             </div>
         </div>
     </div>
@@ -1098,6 +1122,52 @@
         </div>
     </div>
 
+    <!-- Modal Notas do Mestre -->
+    <div id="modal-notas" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-secret"></i> NOTAS DO MESTRE — <span id="notas-titulo" class="destaque-magenta"></span></h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-hint">Só você vê. Segredos, ganchos, o que o jogador não sabe…</div>
+                <textarea id="notas-texto" class="ficha-textarea" rows="8" placeholder="Anotações secretas sobre este personagem..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secundario modal-close">CANCELAR</button>
+                <button id="btn-salvar-notas" class="btn-principal"><i class="fas fa-save"></i> SALVAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal NPC -->
+    <div id="modal-npc" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-skull"></i> <span id="modal-npc-titulo" class="destaque-magenta">NOVO NPC</span></h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="npc-nome"><i class="fas fa-tag"></i> NOME</label>
+                    <input type="text" id="npc-nome" placeholder="Ex: Cão de Guarda Cibernético" maxlength="40" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="npc-hp"><i class="fas fa-heart"></i> VIDA (máx)</label>
+                    <input type="number" id="npc-hp" min="1" max="999" value="10">
+                </div>
+                <div class="form-group">
+                    <label for="npc-nota"><i class="fas fa-align-left"></i> NOTA (opcional)</label>
+                    <textarea id="npc-nota" rows="3" placeholder="Ataques, fraquezas, comportamento..." maxlength="200"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secundario modal-close">CANCELAR</button>
+                <button id="btn-salvar-npc" class="btn-principal"><i class="fas fa-check"></i> SALVAR</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal da Nuvem -->
     <div id="modal-nuvem" class="modal">
         <div class="modal-content">
@@ -1146,8 +1216,8 @@
     <!-- Firebase (nuvem) — SDK compat + configuração -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js?v=4"></script>
+    <script src="firebase-config.js?v=5"></script>
 
-    <script src="script.js?v=4"></script>
+    <script src="script.js?v=5"></script>
 </body>
 </html>

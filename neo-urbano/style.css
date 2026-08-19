@@ -3988,3 +3988,87 @@ body.modo-mestre #btn-voltar-painel { display: inline-flex; }
     .mestre-cond { grid-template-columns: 1fr; }
     .mestre-grid { grid-template-columns: 1fr; }
 }
+
+/* ----- Header do mestre: ações + seções ----- */
+.mestre-header-acoes { display: flex; gap: 8px; flex-wrap: wrap; }
+.mestre-secao {
+    font-family: 'Chakra Petch', sans-serif;
+    color: var(--cor-texto-escuro);
+    letter-spacing: 2px;
+    font-size: 0.9rem;
+    margin: 22px 0 12px;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid var(--cor-borda);
+    padding-bottom: 6px;
+}
+.mestre-secao i { color: var(--accent); }
+
+/* ----- Notas secretas (rodapé do card) ----- */
+.mestre-card-footer { margin-top: 10px; display: flex; gap: 8px; }
+.mestre-notas.tem-nota { border-color: var(--accent-2); color: var(--accent-2); }
+
+/* ----- Card de NPC ----- */
+.npc-card { border-color: rgba(255, 71, 87, 0.35); }
+.npc-icone {
+    flex: 0 0 auto;
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cor-destaque-vermelho);
+    font-size: 1.3rem;
+    border: 1px solid rgba(255, 71, 87, 0.4);
+    border-radius: 8px;
+    background: rgba(255, 71, 87, 0.08);
+}
+.npc-nota {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    color: var(--cor-texto-escuro);
+    background: rgba(10, 14, 20, 0.5);
+    border-left: 2px solid rgba(255, 71, 87, 0.4);
+    padding: 6px 10px;
+    border-radius: 4px;
+    line-height: 1.35;
+}
+
+/* ----- Tracker de combate ----- */
+.combate-painel {
+    background: var(--cor-container);
+    border: 1px solid rgba(var(--accent-rgb), 0.35);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+}
+.combate-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; flex-wrap: wrap; margin-bottom: 10px;
+}
+.combate-head h3 {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'Chakra Petch', sans-serif; font-size: 1rem; color: var(--cor-texto-claro);
+}
+.combate-head h3 i { color: var(--accent); }
+.combate-acoes { display: flex; gap: 6px; flex-wrap: wrap; }
+.combate-lista { display: flex; flex-direction: column; gap: 6px; }
+.combate-row {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(10, 14, 20, 0.5);
+    border: 1px solid var(--cor-borda);
+    border-left: 3px solid var(--cor-borda);
+    border-radius: 6px;
+    padding: 6px 10px;
+}
+.combate-row.atual {
+    border-left-color: var(--accent);
+    box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.2);
+    background: rgba(var(--accent-rgb), 0.08);
+}
+.combate-row.agiu { opacity: 0.55; }
+.combate-ini {
+    min-width: 26px; text-align: center;
+    font-family: 'Chakra Petch', sans-serif; font-weight: 700;
+    color: var(--accent-2); font-size: 1.05rem;
+}
+.combate-tipo { color: var(--cor-texto-escuro); }
+.combate-row.atual .combate-tipo { color: var(--accent); }
+.combate-nome { flex: 1; min-width: 0; color: var(--cor-texto-claro); overflow-wrap: anywhere; }
+.combate-lista .mini-btn { min-width: 24px; }

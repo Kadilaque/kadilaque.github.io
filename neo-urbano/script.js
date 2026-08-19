@@ -374,6 +374,10 @@ let fichaVivaId = null;            // id da ficha do jogador assinada ao vivo
 let unsubscribeFichaViva = null;   // cancela o listener da própria ficha (jogador)
 let unsubscribeMesaMestre = null;  // cancela o listener do dashboard do mestre
 let fichasMesaCache = {};          // id -> dados da ficha (para as ações rápidas do mestre)
+let unsubscribeNpcs = null;        // listener dos NPCs
+let npcsCache = {};                // id -> dados do NPC
+let npcEditId = null;              // NPC em edição no modal
+let unsubscribeCombate = null;     // listener do tracker de combate
 
 // ===== FUNÇÕES DE CONTROLE DE TELAS =====
 function mostrarTela(idTela) {
@@ -1440,6 +1444,50 @@ function configurarEventos() {
     const btnSairMestre = document.getElementById('btn-sair-mestre');
     if (btnSairMestre) btnSairMestre.addEventListener('click', sairModoMestre);
 
+    const btnSalvarNotas = document.getElementById('btn-salvar-notas');
+    if (btnSalvarNotas) btnSalvarNotas.addEventListener('click', salvarNotasMestre);
+
+    // NPCs
+    const btnAddNpc = document.getElementById('btn-add-npc');
+    if (btnAddNpc) btnAddNpc.addEventListener('click', () => abrirModalNpc(null));
+
+    const btnSalvarNpc = document.getElementById('btn-salvar-npc');
+    if (btnSalvarNpc) btnSalvarNpc.addEventListener('click', salvarNpc);
+
+    const npcsGrid = document.getElementById('mestre-npcs');
+    if (npcsGrid) {
+        npcsGrid.addEventListener('click', function(e) {
+            const ed = e.target.closest('.npc-editar'); if (ed) { abrirModalNpc(ed.getAttribute('data-id')); return; }
+            const rm = e.target.closest('.npc-remover'); if (rm) { removerNpc(rm.getAttribute('data-id')); return; }
+            const cb = e.target.closest('.npc-combate'); if (cb) { combateAdicionarNpc(cb.getAttribute('data-id')); return; }
+            const hp = e.target.closest('[data-npcact="hp"]');
+            if (hp) mestreNpcVida(hp.getAttribute('data-id'), parseInt(hp.getAttribute('data-delta'), 10));
+        });
+    }
+
+    // Combate / iniciativa
+    const btnCombJog = document.getElementById('btn-combate-jogadores');
+    if (btnCombJog) btnCombJog.addEventListener('click', combateAdicionarJogadores);
+    const btnCombProx = document.getElementById('btn-combate-proximo');
+    if (btnCombProx) btnCombProx.addEventListener('click', combateProximo);
+    const btnCombRod = document.getElementById('btn-combate-rodada');
+    if (btnCombRod) btnCombRod.addEventListener('click', combateNovaRodada);
+    const btnCombLimpar = document.getElementById('btn-combate-limpar');
+    if (btnCombLimpar) btnCombLimpar.addEventListener('click', combateLimpar);
+
+    const combateLista = document.getElementById('combate-lista');
+    if (combateLista) {
+        combateLista.addEventListener('click', function(e) {
+            const el = e.target.closest('[data-cbt]');
+            if (!el) return;
+            const cbt = el.getAttribute('data-cbt');
+            const cid = el.getAttribute('data-cid');
+            if (cbt === 'ini') combateIni(cid, parseInt(el.getAttribute('data-delta'), 10));
+            else if (cbt === 'agiu') combateAgiu(cid);
+            else if (cbt === 'rem') combateRemover(cid);
+        });
+    }
+
     const btnVoltarPainel = document.getElementById('btn-voltar-painel');
     if (btnVoltarPainel) btnVoltarPainel.addEventListener('click', function() {
         mostrarTela('tela-mestre');
@@ -1452,6 +1500,8 @@ function configurarEventos() {
         mestreGrid.addEventListener('click', function(e) {
             const abrir = e.target.closest('.mestre-abrir');
             if (abrir) { mestreAbrirFicha(abrir.getAttribute('data-id')); return; }
+            const notas = e.target.closest('.mestre-notas');
+            if (notas) { abrirNotasMestre(notas.getAttribute('data-id')); return; }
             const el = e.target.closest('[data-act]');
             if (!el) return;
             const act = el.getAttribute('data-act');
@@ -3075,10 +3125,9 @@ function salvarFichaNuvem(silencioso) {
     const id = fichaAtualId || ('ficha_' + Date.now());
     fichaAtualId = id;
 
-    // Grava a ficha completa (medidores sempre íntegros). O mestre altera os medidores
-    // por update parcial (caminho pontuado), que preserva as demais chaves; e o sync ao
-    // vivo mantém os medidores do jogador atualizados, então o save do jogador não regride.
-    colecaoFichasNuvem().doc(id).set(montarRegistroNuvem(personagem, id))
+    // Grava a ficha completa (medidores sempre íntegros), com merge para NÃO apagar
+    // campos que só o mestre escreve no topo do doc (ex.: notasMestre).
+    colecaoFichasNuvem().doc(id).set(montarRegistroNuvem(personagem, id), { merge: true })
         .then(() => {
             assinarFichaAoVivo(id); // passa a receber ao vivo o que o mestre mudar
             if (!silencioso) alert('Ficha salva na nuvem!');
@@ -3300,6 +3349,8 @@ function sairModoMestre() {
     modoMestre = false;
     document.body.classList.remove('modo-mestre');
     if (unsubscribeMesaMestre) { unsubscribeMesaMestre(); unsubscribeMesaMestre = null; }
+    if (unsubscribeNpcs) { unsubscribeNpcs(); unsubscribeNpcs = null; }
+    if (unsubscribeCombate) { unsubscribeCombate(); unsubscribeCombate = null; }
     mostrarTela('tela-intro');
 }
 
@@ -3321,6 +3372,10 @@ function escutarMesaMestre() {
             grid.appendChild(criarCardMestre(doc.id, doc.data()));
         });
     }, err => { if (grid) grid.innerHTML = '<div class="nuvem-vazio">Erro: ' + escaparHTML(err.message) + '</div>'; });
+
+    // NPCs e tracker de combate (ao vivo)
+    escutarNpcsMestre();
+    escutarCombate();
 }
 
 function barraMestre(label, val, max, tipo, id) {
@@ -3382,6 +3437,11 @@ function criarCardMestre(id, f) {
         </span>
       </div>
       <div class="mestre-cond">${grupoCondicoesMestre(id, p)}</div>
+      <div class="mestre-card-footer">
+        <button class="btn-pequeno mestre-notas${f.notasMestre ? ' tem-nota' : ''}" data-id="${id}">
+          <i class="fas fa-user-secret"></i> Notas${f.notasMestre ? ' •' : ''}
+        </button>
+      </div>
     `;
     return card;
 }
@@ -3423,4 +3483,254 @@ function mestreAbrirFicha(id) {
         aplicarFichaCarregada(doc.data().personagem, id);
         assinarFichaAoVivo(id);
     }).catch(e => alert('Erro ao abrir: ' + e.message));
+}
+
+// ----- Anotações secretas do mestre (por jogador) -----
+let notasMestreId = null;
+
+function abrirNotasMestre(id) {
+    const f = fichasMesaCache[id]; if (!f) return;
+    notasMestreId = id;
+    const modal = document.getElementById('modal-notas');
+    if (!modal) return;
+    const tit = document.getElementById('notas-titulo'); if (tit) tit.textContent = f.nome || 'Sem nome';
+    const ta = document.getElementById('notas-texto'); if (ta) ta.value = f.notasMestre || '';
+    modal.classList.add('active');
+    if (ta) setTimeout(() => ta.focus(), 60);
+}
+
+function salvarNotasMestre() {
+    if (!notasMestreId) return;
+    const ta = document.getElementById('notas-texto');
+    const texto = ta ? ta.value : '';
+    colecaoFichasNuvem().doc(notasMestreId).set({ notasMestre: texto, atualizadoEm: Date.now() }, { merge: true })
+        .catch(e => alert('Erro ao salvar notas: ' + e.message));
+    const modal = document.getElementById('modal-notas');
+    if (modal) modal.classList.remove('active');
+}
+
+// ===== NPCs / INIMIGOS =====
+function colecaoNpcs() {
+    if (!cloudAtivo || !mesaCodigo) return null;
+    return db.collection('mesas').doc(mesaCodigo).collection('npcs');
+}
+
+function escutarNpcsMestre() {
+    const grid = document.getElementById('mestre-npcs');
+    const col = colecaoNpcs();
+    if (!col) return;
+    if (unsubscribeNpcs) { unsubscribeNpcs(); unsubscribeNpcs = null; }
+    unsubscribeNpcs = col.orderBy('criadoEm', 'asc').onSnapshot(snap => {
+        npcsCache = {};
+        if (!grid) return;
+        if (snap.empty) { grid.innerHTML = '<div class="nuvem-vazio">Nenhum NPC/inimigo ainda. Use "+ NPC".</div>'; return; }
+        grid.innerHTML = '';
+        snap.forEach(doc => { npcsCache[doc.id] = doc.data(); grid.appendChild(criarCardNpc(doc.id, doc.data())); });
+    }, err => { if (grid) grid.innerHTML = '<div class="nuvem-vazio">Erro: ' + escaparHTML(err.message) + '</div>'; });
+}
+
+function criarCardNpc(id, n) {
+    const hpMax = n.hpMax || 10;
+    const hp = typeof n.hp === 'number' ? n.hp : hpMax;
+    const pct = hpMax > 0 ? Math.max(0, Math.min(100, (hp / hpMax) * 100)) : 0;
+    const critico = pct <= 25 ? ' critico' : '';
+    const card = document.createElement('div');
+    card.className = 'mestre-card npc-card';
+    card.innerHTML = `
+      <div class="mestre-card-top">
+        <div class="npc-icone"><i class="fas fa-skull"></i></div>
+        <div class="mestre-id">
+          <div class="mestre-nome">${escaparHTML(n.nome || 'NPC')}</div>
+          <div class="mestre-sub">Inimigo / NPC</div>
+        </div>
+        <button class="btn-pequeno npc-editar" data-id="${id}" title="Editar"><i class="fas fa-pen"></i></button>
+        <button class="btn-pequeno npc-remover" data-id="${id}" title="Remover"><i class="fas fa-trash"></i></button>
+      </div>
+      <div class="mestre-vitais">
+        <div class="mestre-barra-row">
+          <span class="mestre-barra-lbl">VIDA</span>
+          <button class="mini-btn dano" data-npcact="hp" data-id="${id}" data-delta="-5">−5</button>
+          <button class="mini-btn dano" data-npcact="hp" data-id="${id}" data-delta="-1">−1</button>
+          <div class="mestre-barra-track"><div class="mestre-barra-fill vida${critico}" style="width:${pct}%"></div><span class="mestre-barra-txt">${hp}/${hpMax}</span></div>
+          <button class="mini-btn cura" data-npcact="hp" data-id="${id}" data-delta="1">+1</button>
+          <button class="mini-btn cura" data-npcact="hp" data-id="${id}" data-delta="5">+5</button>
+        </div>
+      </div>
+      ${n.nota ? `<div class="npc-nota">${escaparHTML(n.nota)}</div>` : ''}
+      <div class="mestre-card-footer">
+        <button class="btn-pequeno npc-combate" data-id="${id}"><i class="fas fa-khanda"></i> + Combate</button>
+      </div>
+    `;
+    return card;
+}
+
+function abrirModalNpc(id) {
+    if (!colecaoNpcs()) { alert('Defina a mesa primeiro.'); return; }
+    npcEditId = id || null;
+    const modal = document.getElementById('modal-npc'); if (!modal) return;
+    const n = id ? (npcsCache[id] || {}) : {};
+    document.getElementById('npc-nome').value = n.nome || '';
+    document.getElementById('npc-hp').value = (typeof n.hpMax === 'number' ? n.hpMax : 10);
+    document.getElementById('npc-nota').value = n.nota || '';
+    const tit = document.getElementById('modal-npc-titulo'); if (tit) tit.textContent = id ? 'EDITAR NPC' : 'NOVO NPC';
+    modal.classList.add('active');
+    setTimeout(() => document.getElementById('npc-nome').focus(), 60);
+}
+
+function salvarNpc() {
+    const col = colecaoNpcs(); if (!col) { alert('Defina a mesa primeiro.'); return; }
+    const nome = (document.getElementById('npc-nome').value || '').trim();
+    const hpMax = Math.max(1, parseInt(document.getElementById('npc-hp').value, 10) || 10);
+    const nota = (document.getElementById('npc-nota').value || '').trim();
+    if (!nome) { alert('Dê um nome ao NPC.'); return; }
+
+    if (npcEditId) {
+        col.doc(npcEditId).set({ nome, hpMax, nota, atualizadoEm: Date.now() }, { merge: true })
+            .catch(e => alert('Erro: ' + e.message));
+    } else {
+        const id = 'npc_' + Date.now();
+        col.doc(id).set({ id, nome, hpMax, hp: hpMax, nota, criadoEm: Date.now(), atualizadoEm: Date.now() })
+            .catch(e => alert('Erro: ' + e.message));
+    }
+    document.getElementById('modal-npc').classList.remove('active');
+}
+
+function mestreNpcVida(id, delta) {
+    const n = npcsCache[id]; if (!n) return;
+    const hpMax = n.hpMax || 10;
+    const hp = typeof n.hp === 'number' ? n.hp : hpMax;
+    const novo = Math.max(0, Math.min(hpMax, hp + delta));
+    colecaoNpcs().doc(id).update({ hp: novo, atualizadoEm: Date.now() }).catch(e => alert('Erro: ' + e.message));
+}
+
+function removerNpc(id) {
+    const n = npcsCache[id];
+    if (!confirm(`Remover NPC "${n ? n.nome : ''}"?`)) return;
+    colecaoNpcs().doc(id).delete().catch(e => alert('Erro: ' + e.message));
+}
+
+// ===== TRACKER DE COMBATE / INICIATIVA =====
+function refMesa() {
+    if (!cloudAtivo || !mesaCodigo) return null;
+    return db.collection('mesas').doc(mesaCodigo);
+}
+
+function escutarCombate() {
+    const ref = refMesa();
+    if (!ref) return;
+    if (unsubscribeCombate) { unsubscribeCombate(); unsubscribeCombate = null; }
+    unsubscribeCombate = ref.onSnapshot(doc => {
+        const data = doc.exists ? doc.data() : {};
+        renderCombate(data.combate || { rodada: 1, turno: 0, lista: [] });
+    }, err => {});
+}
+
+function salvarCombate(combate) {
+    const ref = refMesa(); if (!ref) return;
+    ref.set({ combate }, { merge: true }).catch(e => alert('Erro no combate: ' + e.message));
+}
+
+// devolve o combate atual (do cache do último snapshot, guardado em window)
+function combateAtual() {
+    return window.__combate || { rodada: 1, turno: 0, lista: [] };
+}
+
+function renderCombate(combate) {
+    window.__combate = combate;
+    const rodEl = document.getElementById('combate-rodada'); if (rodEl) rodEl.textContent = combate.rodada || 1;
+    const lista = document.getElementById('combate-lista');
+    if (!lista) return;
+    if (!combate.lista || combate.lista.length === 0) {
+        lista.innerHTML = '<div class="nuvem-vazio">Sem combatentes. Use "+ Jogadores" ou "+ Combate" num NPC.</div>';
+        return;
+    }
+    lista.innerHTML = '';
+    combate.lista.forEach((c, idx) => {
+        const row = document.createElement('div');
+        row.className = 'combate-row' + (idx === (combate.turno || 0) ? ' atual' : '') + (c.agiu ? ' agiu' : '');
+        row.innerHTML = `
+          <span class="combate-ini">${c.ini}</span>
+          <button class="mini-btn" data-cbt="ini" data-cid="${c.cid}" data-delta="1">▲</button>
+          <button class="mini-btn" data-cbt="ini" data-cid="${c.cid}" data-delta="-1">▼</button>
+          <i class="fas ${c.tipo === 'npc' ? 'fa-skull' : 'fa-user'} combate-tipo"></i>
+          <span class="combate-nome">${escaparHTML(c.nome)}</span>
+          <button class="mini-btn" data-cbt="agiu" data-cid="${c.cid}" title="Marcar que agiu">${c.agiu ? '✓' : '○'}</button>
+          <button class="mini-btn dano" data-cbt="rem" data-cid="${c.cid}" title="Tirar">✕</button>
+        `;
+        lista.appendChild(row);
+    });
+}
+
+function combateAdicionarJogadores() {
+    const combate = JSON.parse(JSON.stringify(combateAtual()));
+    const existentes = new Set(combate.lista.map(c => c.cid));
+    Object.keys(fichasMesaCache).forEach(id => {
+        if (existentes.has(id)) return;
+        const f = fichasMesaCache[id];
+        combate.lista.push({ cid: id, nome: f.nome || 'Jogador', ini: 0, tipo: 'jogador', agiu: false });
+    });
+    ordenarCombate(combate);
+    salvarCombate(combate);
+}
+
+function combateAdicionarNpc(npcId) {
+    const n = npcsCache[npcId]; if (!n) return;
+    const combate = JSON.parse(JSON.stringify(combateAtual()));
+    if (combate.lista.some(c => c.cid === npcId)) return;
+    combate.lista.push({ cid: npcId, nome: n.nome || 'NPC', ini: 0, tipo: 'npc', agiu: false });
+    ordenarCombate(combate);
+    salvarCombate(combate);
+}
+
+function ordenarCombate(combate) {
+    combate.lista.sort((a, b) => (b.ini - a.ini));
+}
+
+function combateIni(cid, delta) {
+    const combate = JSON.parse(JSON.stringify(combateAtual()));
+    const c = combate.lista.find(x => x.cid === cid); if (!c) return;
+    c.ini = (c.ini || 0) + delta;
+    ordenarCombate(combate);
+    salvarCombate(combate);
+}
+
+function combateAgiu(cid) {
+    const combate = JSON.parse(JSON.stringify(combateAtual()));
+    const c = combate.lista.find(x => x.cid === cid); if (!c) return;
+    c.agiu = !c.agiu;
+    salvarCombate(combate);
+}
+
+function combateRemover(cid) {
+    const combate = JSON.parse(JSON.stringify(combateAtual()));
+    combate.lista = combate.lista.filter(x => x.cid !== cid);
+    if (combate.turno >= combate.lista.length) combate.turno = 0;
+    salvarCombate(combate);
+}
+
+function combateProximo() {
+    const combate = JSON.parse(JSON.stringify(combateAtual()));
+    if (!combate.lista.length) return;
+    // marca o atual como "agiu"
+    if (combate.lista[combate.turno]) combate.lista[combate.turno].agiu = true;
+    combate.turno = (combate.turno || 0) + 1;
+    if (combate.turno >= combate.lista.length) {
+        combate.turno = 0;
+        combate.rodada = (combate.rodada || 1) + 1;
+        combate.lista.forEach(c => c.agiu = false);
+    }
+    salvarCombate(combate);
+}
+
+function combateNovaRodada() {
+    const combate = JSON.parse(JSON.stringify(combateAtual()));
+    combate.rodada = (combate.rodada || 1) + 1;
+    combate.turno = 0;
+    combate.lista.forEach(c => c.agiu = false);
+    salvarCombate(combate);
+}
+
+function combateLimpar() {
+    if (!confirm('Limpar o combate (tira todos e zera a rodada)?')) return;
+    salvarCombate({ rodada: 1, turno: 0, lista: [] });
 }
