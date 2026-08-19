@@ -2078,9 +2078,10 @@ function atualizarQuadradinhos() {
     medidores.forEach(medidor => {
         const container = document.getElementById(`quad-${medidor}`);
         if (container) {
+            const arr = (personagem.medidores && personagem.medidores[medidor]) || [];
             const quadrados = container.querySelectorAll('.quadrado');
             quadrados.forEach((quadrado, index) => {
-                if (personagem.medidores[medidor][index]) {
+                if (arr[index]) {
                     quadrado.classList.add('preenchido');
                     if (medidor === 'ferimentos') {
                         quadrado.classList.add('dano');
@@ -2564,6 +2565,9 @@ function aplicarFichaCarregada(personagemData, id) {
     normalizarPersonagemCarregado();
     mostrarTela('tela-ficha');
     atualizarFicha();
+    // Reassina o sync ao vivo (ex.: jogador que recarregou e carregou a ficha local).
+    // assinarFichaAoVivo só age se a nuvem estiver ativa e a mesa definida.
+    assinarFichaAoVivo(id);
 }
 
 function carregarFicha(idFicha) {
@@ -3071,6 +3075,9 @@ function salvarFichaNuvem(silencioso) {
     const id = fichaAtualId || ('ficha_' + Date.now());
     fichaAtualId = id;
 
+    // Grava a ficha completa (medidores sempre íntegros). O mestre altera os medidores
+    // por update parcial (caminho pontuado), que preserva as demais chaves; e o sync ao
+    // vivo mantém os medidores do jogador atualizados, então o save do jogador não regride.
     colecaoFichasNuvem().doc(id).set(montarRegistroNuvem(personagem, id))
         .then(() => {
             assinarFichaAoVivo(id); // passa a receber ao vivo o que o mestre mudar
@@ -3177,8 +3184,24 @@ function assinarFichaAoVivo(id) {
 // Aplica só os campos que o mestre controla (medidores, vida/energia, nível, xp)
 function aplicarCamposMestre(remoto) {
     let mudou = false;
-    if (remoto.medidores) { personagem.medidores = remoto.medidores; mudou = true; }
-    if (remoto.statusAtual) { personagem.statusAtual = remoto.statusAtual; mudou = true; }
+    if (remoto.medidores) {
+        if (!personagem.medidores) personagem.medidores = {};
+        // Sobrepõe só as chaves presentes (o mestre pode mandar update parcial)
+        Object.keys(remoto.medidores).forEach(k => {
+            if (Array.isArray(remoto.medidores[k])) personagem.medidores[k] = remoto.medidores[k];
+        });
+        // Garante que todos os 10 medidores existam como array (nunca quebra o render)
+        ['ferimentos', 'estresse', 'exposicao', 'fome', 'sede', 'sono', 'higiene', 'alcool', 'cigarro', 'drogas'].forEach(k => {
+            if (!Array.isArray(personagem.medidores[k])) personagem.medidores[k] = Array(6).fill(false);
+        });
+        mudou = true;
+    }
+    if (remoto.statusAtual) {
+        if (!personagem.statusAtual) personagem.statusAtual = {};
+        if (typeof remoto.statusAtual.vida === 'number') personagem.statusAtual.vida = remoto.statusAtual.vida;
+        if (typeof remoto.statusAtual.energia === 'number') personagem.statusAtual.energia = remoto.statusAtual.energia;
+        mudou = true;
+    }
     if (typeof remoto.nivel === 'number') { personagem.nivel = remoto.nivel; mudou = true; }
     if (typeof remoto.xp === 'number') { personagem.xp = remoto.xp; mudou = true; }
     // Notas do mestre são secretas — não aplicamos/mostramos nada delas aqui.
