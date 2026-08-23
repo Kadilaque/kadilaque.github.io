@@ -3374,15 +3374,36 @@ function escutarMesaMestre() {
     if (unsubscribeMesaMestre) { unsubscribeMesaMestre(); unsubscribeMesaMestre = null; }
     if (grid) grid.innerHTML = '<div class="nuvem-vazio">Conectando…</div>';
 
-    unsubscribeMesaMestre = col.orderBy('atualizadoEm', 'desc').onSnapshot(snap => {
-        fichasMesaCache = {};
+    // Ordem FIXA por id (ordem de criação) — as fichas não pulam de lugar ao serem editadas.
+    // Atualiza só o card que mudou, na posição dele (sem reconstruir o grid, sem piscar).
+    let primeiroSnap = true;
+    unsubscribeMesaMestre = col.onSnapshot(snap => {
+        snap.docs.forEach(d => { fichasMesaCache[d.id] = d.data(); });
         if (!grid) return;
-        if (snap.empty) { grid.innerHTML = '<div class="nuvem-vazio">Nenhuma ficha nesta mesa ainda.</div>'; return; }
-        grid.innerHTML = '';
-        snap.forEach(doc => {
-            fichasMesaCache[doc.id] = doc.data();
-            grid.appendChild(criarCardMestre(doc.id, doc.data()));
+
+        if (primeiroSnap) {
+            primeiroSnap = false;
+            const docs = snap.docs.slice().sort((a, b) => a.id.localeCompare(b.id));
+            if (docs.length === 0) { grid.innerHTML = '<div class="nuvem-vazio">Nenhuma ficha nesta mesa ainda.</div>'; return; }
+            grid.innerHTML = '';
+            docs.forEach(d => grid.appendChild(criarCardMestre(d.id, d.data())));
+            return;
+        }
+
+        const vazio = grid.querySelector('.nuvem-vazio'); if (vazio) vazio.remove();
+        snap.docChanges().forEach(ch => {
+            const id = ch.doc.id;
+            const existente = grid.querySelector(':scope > [data-id="' + id + '"]');
+            if (ch.type === 'removed') {
+                if (existente) existente.remove();
+                delete fichasMesaCache[id];
+            } else if (ch.type === 'modified' && existente) {
+                existente.replaceWith(criarCardMestre(id, ch.doc.data())); // só este card, no mesmo lugar
+            } else if (!existente) {
+                grid.appendChild(criarCardMestre(id, ch.doc.data())); // novo jogador entra no fim
+            }
         });
+        if (!grid.querySelector('.mestre-card')) grid.innerHTML = '<div class="nuvem-vazio">Nenhuma ficha nesta mesa ainda.</div>';
     }, err => { if (grid) grid.innerHTML = '<div class="nuvem-vazio">Erro: ' + escaparHTML(err.message) + '</div>'; });
 
     // NPCs, tracker de combate e notas (ao vivo)
@@ -3428,6 +3449,7 @@ function criarCardMestre(id, f) {
 
     const card = document.createElement('div');
     card.className = 'mestre-card';
+    card.setAttribute('data-id', id);
     card.innerHTML = `
       <div class="mestre-card-top">
         <div class="mestre-foto"${foto ? ` style="background-image:url(${foto})"` : ''}>${foto ? '' : '<i class="fas fa-user-astronaut"></i>'}</div>
