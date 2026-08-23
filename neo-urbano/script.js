@@ -378,6 +378,7 @@ let unsubscribeNpcs = null;        // listener dos NPCs
 let npcsCache = {};                // id -> dados do NPC
 let npcEditId = null;              // NPC em edição no modal
 let unsubscribeCombate = null;     // listener do tracker de combate
+let unsubscribeCompartilhadas = null; // listener das fichas compartilhadas (cópias pra mesa)
 
 // ===== FUNÇÕES DE CONTROLE DE TELAS =====
 function mostrarTela(idTela) {
@@ -1431,6 +1432,21 @@ function configurarEventos() {
         });
     }
 
+    // Compartilhar a própria ficha (jogador)
+    const btnCompartilhar = document.getElementById('btn-compartilhar-ficha');
+    if (btnCompartilhar) btnCompartilhar.addEventListener('click', compartilharMinhaFicha);
+
+    // Lista de fichas compartilhadas (pegar / remover)
+    const nuvemComp = document.getElementById('nuvem-compartilhadas');
+    if (nuvemComp) {
+        nuvemComp.addEventListener('click', function(e) {
+            const pegar = e.target.closest('.comp-pegar');
+            if (pegar) { pegarCompartilhada(pegar.getAttribute('data-id')); return; }
+            const rem = e.target.closest('.comp-remover');
+            if (rem) removerCompartilhada(rem.getAttribute('data-id'));
+        });
+    }
+
     // ===== EVENTOS DO PAINEL DO MESTRE =====
     const btnModoMestre = document.getElementById('btn-modo-mestre');
     if (btnModoMestre) btnModoMestre.addEventListener('click', abrirModalMestre);
@@ -1513,6 +1529,10 @@ function configurarEventos() {
         mestreGrid.addEventListener('click', function(e) {
             const abrir = e.target.closest('.mestre-abrir');
             if (abrir) { mestreAbrirFicha(abrir.getAttribute('data-id')); return; }
+            const enviar = e.target.closest('.mestre-enviar');
+            if (enviar) { mestreEnviarCopia(enviar.getAttribute('data-id')); return; }
+            const excluir = e.target.closest('.mestre-excluir');
+            if (excluir) { mestreExcluirFicha(excluir.getAttribute('data-id')); return; }
             const el = e.target.closest('[data-act]');
             if (!el) return;
             const act = el.getAttribute('data-act');
@@ -3100,7 +3120,7 @@ function abrirModalNuvem() {
     if (!modal) return;
     modal.classList.add('active');
     atualizarStatusNuvem();
-    if (cloudAtivo && mesaCodigo) escutarFichasNuvem();
+    if (cloudAtivo && mesaCodigo) { escutarFichasNuvem(); escutarCompartilhadas(); }
 }
 
 function definirMesa() {
@@ -3110,6 +3130,7 @@ function definirMesa() {
     atualizarStatusNuvem();
     if (cloudAtivo && mesaCodigo) {
         escutarFichasNuvem();
+        escutarCompartilhadas();
     } else {
         const lista = document.getElementById('nuvem-lista');
         if (lista) lista.innerHTML = '<div class="nuvem-vazio">Defina um código de mesa para ver as fichas.</div>';
@@ -3472,6 +3493,10 @@ function criarCardMestre(id, f) {
         </span>
       </div>
       <div class="mestre-cond">${grupoCondicoesMestre(id, p)}</div>
+      <div class="mestre-card-footer">
+        <button class="btn-pequeno mestre-enviar" data-id="${id}"><i class="fas fa-share-nodes"></i> Enviar cópia</button>
+        <button class="btn-pequeno mestre-excluir" data-id="${id}"><i class="fas fa-trash"></i> Excluir</button>
+      </div>
     `;
     return card;
 }
@@ -3513,6 +3538,94 @@ function mestreAbrirFicha(id) {
         aplicarFichaCarregada(doc.data().personagem, id);
         assinarFichaAoVivo(id);
     }).catch(e => alert('Erro ao abrir: ' + e.message));
+}
+
+function mestreExcluirFicha(id) {
+    const f = fichasMesaCache[id];
+    if (!confirm(`Excluir a ficha "${f ? (f.nome || 'sem nome') : ''}" da mesa?\nIsso remove ela da nuvem (o jogador ainda mantém a cópia local dele).`)) return;
+    colecaoFichasNuvem().doc(id).delete().catch(e => alert('Erro ao excluir: ' + e.message));
+}
+
+// ===== ENVIAR CÓPIA DE FICHA PRA MESA (compartilhar) =====
+function colecaoCompartilhadas() {
+    if (!cloudAtivo || !mesaCodigo) return null;
+    return db.collection('mesas').doc(mesaCodigo).collection('compartilhadas');
+}
+
+function enviarCopiaMesa(pers, nome, classe, de) {
+    const col = colecaoCompartilhadas();
+    if (!col) { alert('Defina o código da mesa primeiro (☁ NUVEM).'); return; }
+    if (!pers) { alert('Ficha inválida.'); return; }
+    const id = 'comp_' + Date.now();
+    col.doc(id).set({
+        id,
+        personagem: JSON.parse(JSON.stringify(pers)),
+        nome: nome || 'Sem nome',
+        classe: classe || '',
+        de: de || '',
+        criadoEm: Date.now()
+    }).then(() => alert('Cópia enviada pra mesa! Os jogadores pegam em ☁ NUVEM → "Fichas compartilhadas".'))
+      .catch(e => alert('Erro ao enviar: ' + e.message));
+}
+
+function mestreEnviarCopia(id) {
+    const f = fichasMesaCache[id]; if (!f) return;
+    if (!confirm(`Enviar uma cópia de "${f.nome || 'ficha'}" pra mesa? Qualquer jogador vai poder pegar.`)) return;
+    enviarCopiaMesa(f.personagem, f.nome, f.classe, 'mestre');
+}
+
+function compartilharMinhaFicha() {
+    if (!personagem.nome) { alert('Dê um nome à ficha primeiro.'); return; }
+    if (!colecaoCompartilhadas()) { alert('Defina o código da mesa em ☁ NUVEM primeiro.'); return; }
+    if (!confirm('Enviar uma cópia da sua ficha pra mesa? Outros jogadores vão poder pegar.')) return;
+    enviarCopiaMesa(personagem, personagem.nome, personagem.classe ? personagem.classe.nome : '', personagem.nome);
+}
+
+function escutarCompartilhadas() {
+    const lista = document.getElementById('nuvem-compartilhadas');
+    if (!lista) return;
+    const col = colecaoCompartilhadas();
+    if (!col) { lista.innerHTML = '<div class="nuvem-vazio">Defina uma mesa para ver as fichas compartilhadas.</div>'; return; }
+    if (unsubscribeCompartilhadas) { unsubscribeCompartilhadas(); unsubscribeCompartilhadas = null; }
+    unsubscribeCompartilhadas = col.orderBy('criadoEm', 'desc').onSnapshot(snap => {
+        if (snap.empty) { lista.innerHTML = '<div class="nuvem-vazio">Nenhuma ficha compartilhada ainda.</div>'; return; }
+        lista.innerHTML = '';
+        snap.forEach(doc => {
+            const c = doc.data();
+            const div = document.createElement('div');
+            div.className = 'nuvem-ficha-item';
+            div.innerHTML = `
+              <div class="nuvem-ficha-info">
+                <div class="nuvem-ficha-nome">${escaparHTML(c.nome || 'Sem nome')}</div>
+                <div class="nuvem-ficha-det">${escaparHTML(c.classe || '—')}${c.de ? (' · de ' + escaparHTML(c.de)) : ''}</div>
+              </div>
+              <div class="nuvem-item-acoes">
+                <button class="btn-pequeno comp-pegar" data-id="${doc.id}"><i class="fas fa-download"></i> Pegar</button>
+                ${modoMestre ? `<button class="btn-pequeno comp-remover" data-id="${doc.id}" title="Remover"><i class="fas fa-trash"></i></button>` : ''}
+              </div>
+            `;
+            lista.appendChild(div);
+        });
+    }, err => { lista.innerHTML = '<div class="nuvem-vazio">Erro: ' + escaparHTML(err.message) + '</div>'; });
+}
+
+function pegarCompartilhada(id) {
+    const col = colecaoCompartilhadas(); if (!col) return;
+    col.doc(id).get().then(doc => {
+        if (!doc.exists) { alert('Ficha não encontrada.'); return; }
+        const c = doc.data();
+        const novoId = 'ficha_' + Date.now();
+        fichaAtualId = novoId;
+        aplicarFichaCarregada(c.personagem, novoId); // vira uma cópia sua
+        salvarFichaNuvem(true);                        // salva como a sua ficha na mesa
+        const modal = document.getElementById('modal-nuvem'); if (modal) modal.classList.remove('active');
+        alert(`Você pegou uma cópia de "${c.nome || 'ficha'}". Agora é a sua ficha!`);
+    }).catch(e => alert('Erro ao pegar: ' + e.message));
+}
+
+function removerCompartilhada(id) {
+    if (!confirm('Remover esta ficha compartilhada da mesa?')) return;
+    colecaoCompartilhadas().doc(id).delete().catch(e => alert('Erro: ' + e.message));
 }
 
 // ----- Painel de NOTAS do mestre (várias notas, cada uma com título) -----

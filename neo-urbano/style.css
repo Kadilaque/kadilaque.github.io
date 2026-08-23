@@ -4007,6 +4007,11 @@ body.modo-mestre #btn-voltar-painel { display: inline-flex; }
 .mestre-card-footer { margin-top: 10px; display: flex; gap: 8px; }
 .mestre-notas.tem-nota { border-color: var(--accent-2); color: var(--accent-2); }
 
+/* ----- Ações de excluir/compartilhar ----- */
+.mestre-excluir:hover { border-color: var(--cor-destaque-vermelho); color: var(--cor-destaque-vermelho); background: rgba(255, 71, 87, 0.12); }
+.nuvem-item-acoes { display: flex; gap: 6px; flex: 0 0 auto; }
+.comp-remover:hover { border-color: var(--cor-destaque-vermelho); color: var(--cor-destaque-vermelho); }
+
 /* ----- Card de NPC ----- */
 .npc-card { border-color: rgba(255, 71, 87, 0.35); }
 .npc-icone {
